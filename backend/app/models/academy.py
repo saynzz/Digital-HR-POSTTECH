@@ -1,10 +1,11 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import JSON, Date, DateTime, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Date, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
+from app.db_types import UTCDateTime
 from app.models.request import utcnow
 
 
@@ -60,8 +61,8 @@ class Enrollment(Base):
     progress: Mapped[int] = mapped_column(Integer, default=0)
     score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
-    assigned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    assigned_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
 
     course: Mapped[Course] = relationship()
     employee = relationship("Employee")

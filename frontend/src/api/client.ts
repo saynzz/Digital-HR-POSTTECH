@@ -1,5 +1,6 @@
 import type {
-  AskResponse, CourseDetail, Employee, Enrollment, HRRequest, HRRequestDetail, Me, Notification, RequestType,
+  Account, AskResponse, Candidate, CandidateInput, CandidateStatus, CourseDetail, Employee, Enrollment, HireResult,
+  HRRequest, HRRequestDetail, InviteInfo, InviteResult, Me, Notification, RequestType,
 } from "./types";
 
 const TOKEN_KEY = "janamen_token";
@@ -14,6 +15,22 @@ export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
   }
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  full_name: "ФИО", email: "Email", phone: "Телефон", position: "Должность", department: "Подразделение",
+  start_date: "Дата выхода", password: "Пароль",
+};
+
+function errorMessage(detail: unknown): string {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail) && detail.length) {
+    const fields = detail
+      .map((d) => FIELD_LABELS[String(d?.loc?.[d.loc.length - 1])] ?? null)
+      .filter(Boolean);
+    return fields.length ? `Проверьте поля: ${[...new Set(fields)].join(", ")}` : "Проверьте заполнение полей";
+  }
+  return "Ошибка запроса";
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -32,7 +49,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, typeof body.detail === "string" ? body.detail : "Ошибка запроса");
+    throw new ApiError(res.status, errorMessage(body.detail));
   }
   return res.json();
 }
@@ -70,4 +87,23 @@ export const api = {
     post<Enrollment>("/academy/assign", { employee_id, course_id, due_date }),
 
   ask: (question: string) => post<AskResponse>("/assistant/ask", { question }),
+
+  inviteInfo: (token: string) => request<InviteInfo>(`/auth/invite/${encodeURIComponent(token)}`),
+  activate: (token: string, password: string) => post<{ access_token: string }>("/auth/activate", { token, password }),
+
+  candidates: (status?: CandidateStatus) => request<Candidate[]>(`/hr/candidates${status ? `?status=${status}` : ""}`),
+  createCandidate: (data: CandidateInput) => post<Candidate>("/hr/candidates", data),
+  updateCandidate: (id: number, data: Partial<CandidateInput>) =>
+    request<Candidate>(`/hr/candidates/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  setCandidateStatus: (id: number, status: "interview_pending" | "interview_passed" | "interview_failed", comment?: string) =>
+    post<Candidate>(`/hr/candidates/${id}/status`, { status, comment: comment || null }),
+  archiveCandidate: (id: number, comment?: string) => post<Candidate>(`/hr/candidates/${id}/archive`, { comment: comment || null }),
+  restoreCandidate: (id: number) => post<Candidate>(`/hr/candidates/${id}/restore`),
+  hireCandidate: (id: number, start_date: string, role: "employee" | "manager") =>
+    post<HireResult>(`/hr/candidates/${id}/hire`, { start_date, role }),
+
+  accounts: () => request<Account[]>("/hr/accounts"),
+  sendInvite: (userId: number) => post<InviteResult>(`/hr/accounts/${userId}/invite`),
+  blockAccount: (userId: number) => post<Account>(`/hr/accounts/${userId}/block`),
+  unblockAccount: (userId: number) => post<Account>(`/hr/accounts/${userId}/unblock`),
 };

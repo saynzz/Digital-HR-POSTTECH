@@ -90,3 +90,70 @@ export interface AskResponse {
   found: boolean;
   mode: "llm" | "extractive" | "refusal";
 }
+
+export type CandidateStatus = "interview_pending" | "interview_passed" | "interview_failed" | "hired" | "archived";
+export type AccountStatus = "invited" | "active" | "blocked";
+
+export interface Candidate {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  position: string;
+  department: string;
+  manager: EmployeeShort | null;
+  interview_at: string | null;
+  planned_start_date: string | null;
+  notes: string | null;
+  status: CandidateStatus;
+  status_comment: string | null;
+  employee_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CandidateInput {
+  full_name: string;
+  email: string;
+  phone: string | null;
+  position: string;
+  department: string;
+  manager_id: number | null;
+  interview_at: string | null;
+  planned_start_date: string | null;
+  notes: string | null;
+}
+
+export interface InviteResult {
+  sent_to: string;
+  expires_at: string;
+  email_sent: boolean;
+  email_error: string | null;
+  invite_url: string | null;
+}
+
+export interface HireResult extends InviteResult {
+  candidate: Candidate;
+  user_id: number;
+  employee_id: number;
+}
+
+export interface Account {
+  user_id: number;
+  email: string;
+  role: Role;
+  status: AccountStatus;
+  employee: EmployeeShort;
+  invite_sent_at: string | null;
+  invite_expires_at: string | null;
+  invite_pending: boolean;
+}
+
+export interface InviteInfo {
+  full_name: string;
+  position: string;
+  company: string;
+  email: string;
+  expires_at: string;
+  is_reset: boolean;
+}

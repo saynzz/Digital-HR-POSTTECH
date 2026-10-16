@@ -48,8 +48,3 @@ export const Notifications = () => (
   <Placeholder title="Уведомления" todo={["Список, непрочитанные выделены", "Клик → переход по link и пометка прочитанным", "Прочитать все"]}
     endpoints={["GET /api/notifications", "POST /api/notifications/:id/read", "POST /api/notifications/read-all"]} />
 );
-
-export const HRPanel = () => (
-  <Placeholder title="HR-панель" todo={["Все заявки на оформлении (pending_hr)", "Статус интеграций 1С:ЗУП / Documentolog"]}
-    endpoints={["GET /api/requests?scope=all", "GET /api/integrations"]} />
-);

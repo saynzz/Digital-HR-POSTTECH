@@ -15,7 +15,7 @@ logs:
 
 reset:
 	docker compose down
-	docker volume rm $$(basename $$(pwd))_db_data 2>/dev/null || true
+	docker volume rm "$$(basename "$$PWD" | tr '[:upper:]' '[:lower:]')_db_data"
 
 test:
 	docker compose run --rm --no-deps -e DATABASE_URL=sqlite:///./test.db -e LLM_PROVIDER=none backend pytest -q

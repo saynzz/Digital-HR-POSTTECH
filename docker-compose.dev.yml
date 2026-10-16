@@ -1,6 +1,8 @@
 services:
   backend:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    environment:
+      APP_BASE_URL: ${DEV_APP_BASE_URL:-http://localhost:5173}
     volumes:
       - ./backend:/app
 

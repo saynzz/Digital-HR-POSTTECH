@@ -5,14 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import api_router
 from app.core.config import settings
-from app.db import Base, engine
+from app.db import engine
+from app.schema_sync import ensure_schema
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     import app.models
 
-    Base.metadata.create_all(engine)
+    ensure_schema(engine, settings.reset_db_on_schema_change)
     if settings.seed_on_startup:
         from app.seed import seed
 

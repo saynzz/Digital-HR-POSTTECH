@@ -1,11 +1,13 @@
 import os
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 
 from sqlalchemy import select
 
 from app.core.security import hash_password
 from app.db import Base, SessionLocal, engine
-from app.models import Course, Employee, Enrollment, Lesson, QuizQuestion, RequestType, Role, User
+from app.models import (
+    Candidate, CandidateStatus, Course, Employee, Enrollment, Lesson, QuizQuestion, RequestType, Role, User,
+)
 from app.services import request_workflow as wf
 from app.services.notifications import notify
 
@@ -106,6 +108,26 @@ def seed() -> None:
         ])
         notify(db, u["employee"].id, "course_assigned", f"Назначен курс: {c1.title}", None, f"/academy/{c1.id}")
         notify(db, u["employee2"].id, "course_assigned", f"Назначен курс: {c2.title}", None, f"/academy/{c2.id}")
+
+        def at(days: int, hour: int) -> datetime:
+            return datetime.combine(today + timedelta(days=days), time(hour), tzinfo=timezone(timedelta(hours=5)))
+
+        db.add_all([
+            Candidate(full_name="Серикбаев Арман Ержанович", email="arman.s@jana.demo", phone="+7 700 000 00 01",
+                      position="Оператор сортировочного центра", department="Логистика", manager_id=head_log.id,
+                      interview_at=at(1, 11), planned_start_date=today + timedelta(days=14),
+                      notes="Опыт работы на складе 2 года. Готов к сменному графику.",
+                      created_by_user_id=u["hr"].id),
+            Candidate(full_name="Оспанова Дана Болатовна", email="dana.o@jana.demo", phone="+7 700 000 00 02",
+                      position="Специалист по логистике", department="Логистика", manager_id=head_log.id,
+                      interview_at=at(-1, 15), planned_start_date=today + timedelta(days=7),
+                      notes="Знание ВЭД, английский B2.", status=CandidateStatus.interview_passed,
+                      status_comment="Рекомендована руководителем отдела", created_by_user_id=u["hr"].id),
+            Candidate(full_name="Ким Руслан Викторович", email="ruslan.k@jana.demo", phone="+7 700 000 00 03",
+                      position="Бухгалтер", department="Финансы", manager_id=head_fin.id,
+                      interview_at=at(-3, 10), status=CandidateStatus.interview_failed,
+                      status_comment="Недостаточно опыта работы с 1С", created_by_user_id=u["hr"].id),
+        ])
         db.commit()
         print("Seed: тестовые данные созданы")
     finally:

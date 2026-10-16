@@ -7,6 +7,7 @@ interface AuthState {
   user: Me | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  activate: (token: string, password: string) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<void>;
 }
@@ -43,12 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await refresh();
   };
 
+  const activate = async (token: string, password: string) => {
+    const { access_token } = await api.activate(token, password);
+    tokenStore.set(access_token);
+    await refresh();
+  };
+
   const logout = () => {
     tokenStore.clear();
     setUser(null);
   };
 
-  return <AuthCtx.Provider value={{ user, loading, login, logout, refresh }}>{children}</AuthCtx.Provider>;
+  return <AuthCtx.Provider value={{ user, loading, login, activate, logout, refresh }}>{children}</AuthCtx.Provider>;
 }
 
 export const useAuth = () => useContext(AuthCtx);

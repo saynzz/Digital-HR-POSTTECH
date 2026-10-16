@@ -4,7 +4,7 @@ from datetime import date
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.integrations.base import EmployeeRecord
+from app.integrations.base import EmployeeRecord, NewHire
 from app.models import Employee
 
 
@@ -14,6 +14,22 @@ class Mock1CZupAdapter:
 
     def _get(self, external_id: str) -> Employee | None:
         return self.db.scalar(select(Employee).where(Employee.external_id == external_id))
+
+    def create_employee(self, hire: NewHire) -> str:
+        manager = self._get(hire.manager_external_id) if hire.manager_external_id else None
+        external_id = f"ZUP-{uuid.uuid4().hex[:6].upper()}"
+        self.db.add(Employee(
+            external_id=external_id,
+            full_name=hire.full_name,
+            company="ТОО «Jana Post» (демо)",
+            position=hire.position,
+            department=hire.department,
+            manager=manager,
+            hire_date=hire.hire_date,
+            vacation_balance_days=0,
+        ))
+        self.db.flush()
+        return external_id
 
     def get_employee(self, external_id: str) -> EmployeeRecord | None:
         e = self._get(external_id)

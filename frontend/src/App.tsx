@@ -2,14 +2,17 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "./auth/AuthContext";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import Activate from "./pages/Activate";
+import HRPanel from "./pages/hr/HRPanel";
 import Login from "./pages/Login";
 import Requests from "./pages/Requests";
-import { Academy, Assistant, CourseView, HRPanel, Notifications, RequestDetail, RequestNew, Team } from "./pages/stubs";
+import { Academy, Assistant, CourseView, Notifications, RequestDetail, RequestNew, Team } from "./pages/stubs";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/activate" element={<Activate />} />
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Dashboard />} />
         <Route path="requests" element={<Requests />} />

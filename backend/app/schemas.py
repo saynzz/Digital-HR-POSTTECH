@@ -1,9 +1,9 @@
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from app.models import EnrollmentStatus, RequestStatus, RequestType, Role
+from app.models import AccountStatus, CandidateStatus, EnrollmentStatus, RequestStatus, RequestType, Role
 
 
 class ORM(BaseModel):
@@ -166,3 +166,98 @@ class AskOut(BaseModel):
     sources: list[SourceOut]
     found: bool
     mode: Literal["llm", "extractive", "refusal"]
+
+
+class CandidateIn(BaseModel):
+    full_name: str = Field(min_length=3, max_length=255)
+    email: EmailStr
+    phone: str | None = Field(default=None, max_length=32)
+    position: str = Field(min_length=2, max_length=255)
+    department: str = Field(min_length=2, max_length=255)
+    manager_id: int | None = None
+    interview_at: datetime | None = None
+    planned_start_date: date | None = None
+    notes: str | None = Field(default=None, max_length=4000)
+
+
+class CandidateUpdate(BaseModel):
+    full_name: str | None = Field(default=None, min_length=3, max_length=255)
+    email: EmailStr | None = None
+    phone: str | None = Field(default=None, max_length=32)
+    position: str | None = Field(default=None, min_length=2, max_length=255)
+    department: str | None = Field(default=None, min_length=2, max_length=255)
+    manager_id: int | None = None
+    interview_at: datetime | None = None
+    planned_start_date: date | None = None
+    notes: str | None = Field(default=None, max_length=4000)
+
+
+class CandidateOut(ORM):
+    id: int
+    full_name: str
+    email: str
+    phone: str | None
+    position: str
+    department: str
+    manager: EmployeeShort | None
+    interview_at: datetime | None
+    planned_start_date: date | None
+    notes: str | None
+    status: CandidateStatus
+    status_comment: str | None
+    employee_id: int | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class CandidateStatusIn(BaseModel):
+    status: Literal["interview_pending", "interview_passed", "interview_failed"]
+    comment: str | None = Field(default=None, max_length=1000)
+
+
+class ArchiveIn(BaseModel):
+    comment: str | None = Field(default=None, max_length=1000)
+
+
+class HireIn(BaseModel):
+    start_date: date
+    role: Literal["employee", "manager"] = "employee"
+
+
+class InviteOut(BaseModel):
+    sent_to: str
+    expires_at: datetime
+    email_sent: bool
+    email_error: str | None = None
+    invite_url: str | None = None
+
+
+class HireOut(InviteOut):
+    candidate: CandidateOut
+    user_id: int
+    employee_id: int
+
+
+class AccountOut(BaseModel):
+    user_id: int
+    email: str
+    role: Role
+    status: AccountStatus
+    employee: EmployeeShort
+    invite_sent_at: datetime | None = None
+    invite_expires_at: datetime | None = None
+    invite_pending: bool = False
+
+
+class InviteInfoOut(BaseModel):
+    full_name: str
+    position: str
+    company: str
+    email: str
+    expires_at: datetime
+    is_reset: bool
+
+
+class ActivateIn(BaseModel):
+    token: str = Field(min_length=10, max_length=200)
+    password: str = Field(min_length=1, max_length=128)

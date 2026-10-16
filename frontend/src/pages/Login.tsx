@@ -57,6 +57,9 @@ export default function Login() {
           </label>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button type="submit" disabled={busy} className="w-full">{t("auth.login")}</Button>
+          <p className="text-center text-xs text-gray-400">
+            Нет пароля или забыли его? Доступ выдаёт HR — ссылка для создания пароля придёт на рабочую почту.
+          </p>
         </form>
         <div className="mt-4 rounded-2xl border border-dashed border-gray-300 p-4">
           <p className="mb-2 text-xs font-semibold uppercase text-gray-400">Демо-доступ</p>

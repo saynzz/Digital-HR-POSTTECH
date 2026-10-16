@@ -100,3 +100,61 @@ export function Placeholder({ title, todo, endpoints }: { title: string; todo: s
 
 export const fmtDate = (s: string) => new Date(s).toLocaleDateString("ru-RU");
 export const fmtMoney = (n: number) => `${n.toLocaleString("ru-RU")} ₸`;
+
+export function Badge({ tone = "gray", children }: {
+  tone?: "gray" | "amber" | "green" | "red" | "blue"; children: ReactNode;
+}) {
+  const tones = {
+    gray: "bg-gray-100 text-gray-600",
+    amber: "bg-amber-100 text-amber-800",
+    green: "bg-brand-100 text-brand-700",
+    red: "bg-red-100 text-red-700",
+    blue: "bg-blue-100 text-blue-800",
+  };
+  return <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${tones[tone]}`}>{children}</span>;
+}
+
+export function Modal({ open, title, onClose, children, footer, wide }: {
+  open: boolean; title: ReactNode; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+        className={`flex max-h-[92vh] w-full flex-col rounded-t-2xl bg-white shadow-xl sm:rounded-2xl ${wide ? "sm:max-w-2xl" : "sm:max-w-lg"}`}
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4">
+          <h2 className="text-lg font-semibold">{title}</h2>
+          <button onClick={onClose} className="rounded-lg px-2 text-2xl leading-none text-gray-400 hover:bg-gray-100" aria-label="Закрыть">×</button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        {footer && <div className="flex flex-wrap justify-end gap-2 border-t border-gray-100 px-5 py-3">{footer}</div>}
+      </div>
+    </div>
+  );
+}
+
+export const inputCls =
+  "mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 disabled:bg-gray-50";
+
+export function Field({ label, required, hint, children }: {
+  label: string; required?: boolean; hint?: string; children: ReactNode;
+}) {
+  return (
+    <label className="block text-sm">
+      <span className="font-medium">{label}{required && <span className="text-red-500"> *</span>}</span>
+      {children}
+      {hint && <span className="mt-1 block text-xs text-gray-400">{hint}</span>}
+    </label>
+  );
+}
+
+export function ErrorText({ children }: { children: ReactNode }) {
+  return children ? <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{children}</p> : null;
+}
+
+export const fmtDateTime = (s: string) =>
+  new Date(s).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });

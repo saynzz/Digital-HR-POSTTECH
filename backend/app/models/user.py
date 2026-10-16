@@ -13,6 +13,12 @@ class Role(str, enum.Enum):
     hr = "hr"
 
 
+class AccountStatus(str, enum.Enum):
+    invited = "invited"
+    active = "active"
+    blocked = "blocked"
+
+
 class Employee(Base):
     __tablename__ = "employees"
 
@@ -35,8 +41,9 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[Role] = mapped_column(Enum(Role))
+    status: Mapped[AccountStatus] = mapped_column(Enum(AccountStatus), default=AccountStatus.active)
     locale: Mapped[str] = mapped_column(String(5), default="ru")
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), unique=True)
 

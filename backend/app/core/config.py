@@ -11,9 +11,22 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 60 * 12
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
     seed_on_startup: bool = True
+    reset_db_on_schema_change: bool = True
 
     hr_system_provider: str = "mock"
     docflow_provider: str = "mock"
+    mail_provider: str = "auto"
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_ssl: bool = False
+    smtp_user: str = ""
+    smtp_password: str = ""
+    mail_from: str = ""
+    mail_from_name: str = "JanaMen · Jana Post"
+
+    app_base_url: str = "http://localhost:5173"
+    invite_ttl_hours: int = 72
+    expose_invite_links: bool = True
 
     assistant_min_score: float = 0.4
     llm_provider: str = "none"

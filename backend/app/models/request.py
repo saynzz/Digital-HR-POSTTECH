@@ -1,10 +1,11 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import JSON, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
+from app.db_types import UTCDateTime
 
 
 def utcnow() -> datetime:
@@ -33,8 +34,8 @@ class HRRequest(Base):
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True)
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     external_doc_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, onupdate=utcnow)
 
     employee = relationship("Employee")
     events: Mapped[list["RequestEvent"]] = relationship(
@@ -51,7 +52,7 @@ class RequestEvent(Base):
     to_status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus))
     actor_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
 
     request: Mapped[HRRequest] = relationship(back_populates="events")
     actor = relationship("User")
