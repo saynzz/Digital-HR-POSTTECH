@@ -1,5 +1,5 @@
 import type {
-  Account, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, HireResult,
+  Account, AgentCommands, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, HireResult,
   HRRequest, HRRequestDetail, InviteInfo, InviteResult, Me, Notification, RequestType,
 } from "./types";
 
@@ -90,6 +90,18 @@ export const api = {
 
   ask: (question: string) => post<AskResponse>("/assistant/ask", { question }),
   escalate: (question: string) => post<{ ok: boolean }>("/assistant/escalate", { question }),
+  agentCommands: () => request<AgentCommands>("/assistant/commands"),
+  download: async (path: string, filename: string) => {
+    const token = tokenStore.get();
+    const res = await fetch(`/api${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (!res.ok) throw new ApiError(res.status, "Не удалось скачать файл");
+    const url = URL.createObjectURL(await res.blob());
+    const a = Object.assign(document.createElement("a"), { href: url, download: filename });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
 
   inviteInfo: (token: string) => request<InviteInfo>(`/auth/invite/${encodeURIComponent(token)}`),
   activate: (token: string, password: string) => post<{ access_token: string }>("/auth/activate", { token, password }),

@@ -85,11 +85,45 @@ export interface CourseDetail extends Course {
   enrollment: Enrollment | null;
 }
 
+export type Tone = "good" | "warn" | "bad" | "muted" | "brand" | null;
+
+export interface Cell { text: string; tone: Tone }
+
+export type ReportBlock =
+  | { type: "person"; name: string; full_name: string; position: string; department: string; manager: string | null;
+      hire_date: string; tenure: string; account: string; initials: string }
+  | { type: "stats"; items: { label: string; value: string; hint: string | null; tone: Tone }[] }
+  | { type: "bars"; title: string; unit: string; empty: string; orientation?: "vertical";
+      items: { label: string; value: number; display: string | null; tone: Tone; cmd: string | null }[] }
+  | { type: "table"; title: string | null; empty: string; columns: { label: string; align: "left" | "right" }[];
+      rows: { cells: Cell[]; cmd: string | null; link: string | null }[] }
+  | { type: "signals"; title: string; empty: string; more: number;
+      items: { level: "high" | "medium" | "info"; code: string; text: string; action: string; who: string;
+               cmd: string | null; link: string | null }[] }
+  | { type: "timeline"; title: string; more: number;
+      items: { date: string; title: string; sub: string; tone: Tone; link?: string }[] }
+  | { type: "gantt"; title: string; start: string; end: string; today: string;
+      rows: { name: string; cmd: string; bars: { start: string; end: string; status: "approved" | "pending"; label: string; link: string }[] }[];
+      overlaps: { start: string; end: string; names: string[] }[] }
+  | { type: "notes"; title: string; items: string[] }
+  | { type: "export"; label: string; url: string; filename: string }
+  | { type: "commands"; items: { cmd: string; run: string | null; title: string; hint: string }[] };
+
+export interface Report { title: string; subtitle: string | null; blocks: ReportBlock[] }
+
 export interface AskResponse {
   answer: string;
   sources: { doc_id: string; title: string; section: string | null; url: string | null }[];
   found: boolean;
-  mode: "llm" | "extractive" | "refusal";
+  mode: "llm" | "extractive" | "refusal" | "analytics";
+  report?: Report | null;
+  insight?: string | null;
+  suggestions?: string[];
+}
+
+export interface AgentCommands {
+  commands: { cmd: string; title: string; hint: string; arg: string | null }[];
+  people: { id: number; name: string; position: string; department: string }[];
 }
 
 export type CandidateStatus = "interview_pending" | "interview_passed" | "interview_failed" | "hired" | "archived";

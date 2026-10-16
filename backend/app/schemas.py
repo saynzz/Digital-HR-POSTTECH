@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -166,11 +166,20 @@ class EscalateIn(BaseModel):
     question: str = Field(min_length=2, max_length=1000)
 
 
+class ReportOut(BaseModel):
+    title: str
+    subtitle: str | None = None
+    blocks: list[dict[str, Any]]
+
+
 class AskOut(BaseModel):
     answer: str
     sources: list[SourceOut]
     found: bool
-    mode: Literal["llm", "extractive", "refusal"]
+    mode: Literal["llm", "extractive", "refusal", "analytics"]
+    report: ReportOut | None = None
+    insight: str | None = None
+    suggestions: list[str] = []
 
 
 class CandidateIn(BaseModel):

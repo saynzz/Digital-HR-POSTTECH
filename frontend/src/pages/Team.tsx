@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { GraduationCap, Search } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { BarChart3, GraduationCap, Search, UserSearch } from "lucide-react";
 import { api } from "../api/client";
 import type { Course, Employee, HRRequest } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
@@ -15,6 +15,8 @@ export default function Team() {
   const [history, setHistory] = useState<HRRequest[]>([]);
   const [query, setQuery] = useState("");
   const [assignTo, setAssignTo] = useState<Employee | null>(null);
+  const navigate = useNavigate();
+  const agent = (q: string) => navigate(`/assistant?q=${encodeURIComponent(q)}`);
 
   useEffect(() => {
     api.team().then(setPeople);
@@ -36,6 +38,12 @@ export default function Team() {
       <PageHeader
         title={isHr ? "Сотрудники" : "Моя команда"}
         subtitle={isHr ? "Очередь на оформление и все сотрудники компании." : "Заявки, которые ждут вашего решения, и ваши подчинённые."}
+        action={
+          <button onClick={() => agent("/команда")}
+            className="inline-flex items-center gap-2 rounded-full bg-forest px-5 py-3 text-[15px] font-semibold text-white transition hover:bg-forest-2">
+            <BarChart3 size={18} className="text-signal" /> Аналитика {isHr ? "по компании" : "команды"}
+          </button>
+        }
       />
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
@@ -90,9 +98,14 @@ export default function Team() {
                   <div><dt className="text-muted">Отдел</dt><dd className="font-medium">{p.department}</dd></div>
                   <div><dt className="text-muted">Отпуск</dt><dd className="font-medium">{p.vacation_balance_days} {pluralRu(p.vacation_balance_days, ["день", "дня", "дней"])}</dd></div>
                 </dl>
-                <Button variant="light" className="mt-4" onClick={() => setAssignTo(p)}>
-                  <GraduationCap size={16} /> Назначить курс
-                </Button>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <Button variant="dark" onClick={() => agent(`/сотрудник ${p.full_name.split(" ").slice(0, 2).join(" ")}`)}>
+                    <UserSearch size={16} /> Досье
+                  </Button>
+                  <Button variant="light" onClick={() => setAssignTo(p)}>
+                    <GraduationCap size={16} /> Курс
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

@@ -10,10 +10,12 @@ log = logging.getLogger("uvicorn.error")
 
 def outdated_tables(engine: Engine) -> list[str]:
     insp = inspect(engine)
-    stale = []
-    for table in Base.metadata.sorted_tables:
-        if not insp.has_table(table.name):
-            continue
+    tables = Base.metadata.sorted_tables
+    present = [t for t in tables if insp.has_table(t.name)]
+    if not present:
+        return []
+    stale = [t.name for t in tables if t not in present]
+    for table in present:
         existing = {c["name"] for c in insp.get_columns(table.name)}
         if set(table.columns.keys()) - existing:
             stale.append(table.name)

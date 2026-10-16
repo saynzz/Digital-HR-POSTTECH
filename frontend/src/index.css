@@ -153,6 +153,14 @@ body {
 .parcel-bounce { animation: parcel-bounce 0.5s ease-out; }
 @keyframes parcel-bounce { 40% { transform: translateY(-18px); } }
 
+.bar-grow { transform-origin: left center; animation: bar-grow 0.7s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.bar-rise { transform-origin: bottom center; animation: bar-rise 0.6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes bar-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.gantt-pending {
+  background: repeating-linear-gradient(135deg, var(--color-signal) 0 6px, #f7d66a 6px 12px);
+}
+
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -166,5 +174,5 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .van-idle, .parcel-idle, .parcel-pop, .cloud, .city-layer, .lane, .van-shake, .parcel-bounce,
-  .rise-in, .typing-dot, .star { animation: none !important; }
+  .rise-in, .typing-dot, .star, .bar-grow, .bar-rise { animation: none !important; }
 }
