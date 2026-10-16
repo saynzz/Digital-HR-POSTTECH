@@ -6,7 +6,7 @@ import type { Enrollment, HRRequest, Notification } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import EmployeePass from "../components/EmployeePass";
 import RequestRow from "../components/RequestRow";
-import { Card, Empty, buttonClass, fmtDate, pluralRu } from "../components/ui";
+import { Card, Empty, Ring, buttonClass, fmtDate, pluralRu } from "../components/ui";
 import { useI18n } from "../i18n";
 
 const isActive = (r: HRRequest) => r.status === "pending_manager" || r.status === "pending_hr";
@@ -135,19 +135,6 @@ export default function Dashboard() {
   );
 }
 
-function Ring({ value }: { value: number }) {
-  const r = 22, c = 2 * Math.PI * r;
-  return (
-    <div className="relative h-14 w-14">
-      <svg viewBox="0 0 56 56" className="h-14 w-14 -rotate-90">
-        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-paper)" strokeWidth="6" />
-        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-brand-600)" strokeWidth="6" strokeLinecap="round"
-          strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center font-display text-[12px] font-bold">{value}%</span>
-    </div>
-  );
-}
 
 function RouteBackdrop() {
   return (

@@ -6,7 +6,13 @@ import Activate from "./pages/Activate";
 import HRPanel from "./pages/hr/HRPanel";
 import Login from "./pages/Login";
 import Requests from "./pages/Requests";
-import { Academy, Assistant, CourseView, Notifications, RequestDetail, RequestNew, Team } from "./pages/stubs";
+import Academy from "./pages/Academy";
+import Assistant from "./pages/Assistant";
+import CourseView from "./pages/CourseView";
+import Notifications from "./pages/Notifications";
+import RequestDetail from "./pages/RequestDetail";
+import RequestNew from "./pages/RequestNew";
+import Team from "./pages/Team";
 
 export default function App() {
   return (

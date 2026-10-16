@@ -56,3 +56,7 @@ class RequestEvent(Base):
 
     request: Mapped[HRRequest] = relationship(back_populates="events")
     actor = relationship("User")
+
+    @property
+    def actor_name(self) -> str | None:
+        return self.actor.employee.full_name if self.actor and self.actor.employee else None

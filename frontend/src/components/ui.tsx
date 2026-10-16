@@ -204,3 +204,17 @@ export function ErrorText({ children }: { children: ReactNode }) {
 
 export const fmtDateTime = (s: string) =>
   new Date(s).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+export function Ring({ value, size = 56 }: { value: number; size?: number }) {
+  const r = 22, c = 2 * Math.PI * r;
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg viewBox="0 0 56 56" className="-rotate-90" width={size} height={size}>
+        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-paper)" strokeWidth="6" />
+        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-brand-600)" strokeWidth="6" strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center font-display text-[12px] font-bold">{value}%</span>
+    </div>
+  );
+}

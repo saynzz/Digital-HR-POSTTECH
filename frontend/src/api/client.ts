@@ -1,5 +1,5 @@
 import type {
-  Account, AskResponse, Candidate, CandidateInput, CandidateStatus, CourseDetail, Employee, Enrollment, HireResult,
+  Account, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, HireResult,
   HRRequest, HRRequestDetail, InviteInfo, InviteResult, Me, Notification, RequestType,
 } from "./types";
 
@@ -78,6 +78,8 @@ export const api = {
   markAllRead: () => post<{ ok: boolean }>("/notifications/read-all"),
 
   myCourses: () => request<Enrollment[]>("/academy/my"),
+  catalog: () => request<Course[]>("/academy/courses"),
+  startCourse: (id: number) => post<Enrollment>(`/academy/courses/${id}/start`),
   course: (id: number) => request<CourseDetail>(`/academy/courses/${id}`),
   completeLesson: (courseId: number, lessonId: number) =>
     post<Enrollment>(`/academy/courses/${courseId}/lessons/${lessonId}/complete`),
@@ -87,6 +89,7 @@ export const api = {
     post<Enrollment>("/academy/assign", { employee_id, course_id, due_date }),
 
   ask: (question: string) => post<AskResponse>("/assistant/ask", { question }),
+  escalate: (question: string) => post<{ ok: boolean }>("/assistant/escalate", { question }),
 
   inviteInfo: (token: string) => request<InviteInfo>(`/auth/invite/${encodeURIComponent(token)}`),
   activate: (token: string, password: string) => post<{ access_token: string }>("/auth/activate", { token, password }),

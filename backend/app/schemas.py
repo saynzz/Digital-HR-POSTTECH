@@ -74,6 +74,7 @@ class RequestEventOut(ORM):
     from_status: RequestStatus | None
     to_status: RequestStatus
     comment: str | None
+    actor_name: str | None = None
     created_at: datetime
 
 
@@ -159,6 +160,10 @@ class SourceOut(BaseModel):
     title: str
     section: str | None = None
     url: str | None = None
+
+
+class EscalateIn(BaseModel):
+    question: str = Field(min_length=2, max_length=1000)
 
 
 class AskOut(BaseModel):

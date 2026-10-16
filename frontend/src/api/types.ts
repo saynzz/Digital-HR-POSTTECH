@@ -31,6 +31,7 @@ export interface RequestEvent {
   from_status: RequestStatus | null;
   to_status: RequestStatus;
   comment: string | null;
+  actor_name: string | null;
   created_at: string;
 }
 

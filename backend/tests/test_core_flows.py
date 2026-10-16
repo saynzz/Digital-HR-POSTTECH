@@ -110,3 +110,21 @@ def test_assistant_respects_roles(client):
     r = client.post("/api/assistant/ask", headers=emp,
                     json={"question": "Как руководителю согласовать заявки подчинённых?"}).json()
     assert all(s["doc_id"] != "manager_guide" for s in r["sources"])
+
+
+def test_request_history_has_actor_names(client):
+    emp = login(client, "employee@jana.demo")
+    first = client.get("/api/requests?scope=my", headers=emp).json()[-1]
+    detail = client.get(f"/api/requests/{first['id']}", headers=emp).json()
+    assert any(ev["actor_name"] and "Касымов" in ev["actor_name"] for ev in detail["events"])
+
+
+def test_escalate_question_to_hr(client):
+    emp = login(client, "employee2@jana.demo")
+    hr = login(client, "hr@jana.demo")
+    r = client.post("/api/assistant/escalate", headers=emp, json={"question": "Положена ли мне компенсация за обед?"})
+    assert r.status_code == 200
+    notes = client.get("/api/notifications", headers=hr).json()
+    assert any("компенсация за обед" in (n["body"] or "") for n in notes)
+    mine = client.get("/api/notifications", headers=emp).json()
+    assert mine[0]["title"] == "Вопрос передан в HR"
