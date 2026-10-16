@@ -1,0 +1,25 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    app_name: str = "JanaMen API"
+    database_url: str = "sqlite:///./janamen.db"
+    jwt_secret: str = "dev-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 60 * 12
+    cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    seed_on_startup: bool = True
+
+    hr_system_provider: str = "mock"
+    docflow_provider: str = "mock"
+
+    assistant_min_score: float = 0.4
+    llm_provider: str = "none"
+    ollama_base_url: str = "http://localhost:11434"
+    llm_model: str = "qwen2.5:3b"
+    llm_timeout: float = 120.0
+
+
+settings = Settings()
