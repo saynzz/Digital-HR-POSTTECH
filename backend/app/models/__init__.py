@@ -1,5 +1,7 @@
 from app.models.audit import AuditLog
-from app.models.academy import Course, Enrollment, EnrollmentStatus, Lesson, QuizQuestion
+from app.models.academy import (
+    Course, EarnedBadge, Enrollment, EnrollmentStatus, Lesson, QuizQuestion, Track, TrackCourse, TrackEnrollment, XpEvent,
+)
 from app.models.notification import Notification
 from app.models.onboarding import Candidate, CandidateStatus, InviteToken
 from app.models.request import HRRequest, RequestEvent, RequestStatus, RequestType
@@ -12,6 +14,11 @@ __all__ = [
     "CandidateStatus",
     "InviteToken",
     "Course",
+    "EarnedBadge",
+    "Track",
+    "TrackCourse",
+    "TrackEnrollment",
+    "XpEvent",
     "Employee",
     "Enrollment",
     "EnrollmentStatus",

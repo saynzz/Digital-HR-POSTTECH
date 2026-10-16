@@ -161,6 +161,23 @@ body {
   background: repeating-linear-gradient(135deg, var(--color-signal) 0 6px, #f7d66a 6px 12px);
 }
 
+.flame { transform-origin: 50% 90%; animation: flame 1.4s ease-in-out infinite; }
+@keyframes flame { 0%, 100% { transform: scale(1) rotate(0); } 30% { transform: scale(1.08, 0.94) rotate(-3deg); } 60% { transform: scale(0.95, 1.07) rotate(2deg); } }
+.van-hop { animation: van-hop 0.9s ease-in-out infinite; }
+@keyframes van-hop { 50% { transform: translateY(-3px); } }
+.badge-shine { position: relative; overflow: hidden; }
+.badge-shine::after {
+  content: ""; position: absolute; inset: -40%; background: linear-gradient(115deg, transparent 40%, rgb(255 255 255 / 0.65) 50%, transparent 60%);
+  animation: shine 3.2s ease-in-out infinite;
+}
+@keyframes shine { 0% { transform: translateX(-60%); } 45%, 100% { transform: translateX(60%); } }
+.xp-toast { animation: xp-toast 0.5s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes xp-toast { from { transform: translateY(30px) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
+.confetti { animation: confetti-fall linear forwards; }
+@keyframes confetti-fall { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+.xp-float { animation: xp-float 1.2s ease-out forwards; }
+@keyframes xp-float { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-40px); opacity: 0; } }
+
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -174,5 +191,5 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .van-idle, .parcel-idle, .parcel-pop, .cloud, .city-layer, .lane, .van-shake, .parcel-bounce,
-  .rise-in, .typing-dot, .star, .bar-grow, .bar-rise { animation: none !important; }
+  .rise-in, .typing-dot, .star, .bar-grow, .bar-rise, .flame, .van-hop, .badge-shine::after, .xp-toast, .confetti, .xp-float { animation: none !important; }
 }

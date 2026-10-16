@@ -15,8 +15,9 @@ from app.integrations.base import NewHire
 from app.integrations.mock_mail import MockMailAdapter
 from app.integrations.smtp_mail import MailDeliveryError
 from app.models import (
-    AccountStatus, Candidate, CandidateStatus, Course, Employee, Enrollment, InviteToken, Role, User,
+    AccountStatus, Candidate, CandidateStatus, Course, Employee, Enrollment, InviteToken, Role, Track, User,
 )
+from app.services.gamification import enroll_track
 from app.services.mail_templates import invite_email
 from app.services.notifications import notify
 
@@ -140,8 +141,13 @@ def hire(db: Session, hr: User, c: Candidate, start_date: date, role: Role) -> t
     c.status, c.employee_id = S.hired, employee.id
 
     welcome = db.scalar(select(Course).where(Course.title == WELCOME_COURSE_TITLE))
+    track = db.scalar(select(Track).where(Track.slug == "onboarding"))
     db.flush()
-    if welcome:
+    if track:
+        enroll_track(db, employee, track, hr, start_date + timedelta(days=30))
+        notify(db, user.id, "course_assigned", f"Назначена траектория: {track.title}",
+               f"Курсов: {len(track.steps)}, пройти за первый месяц", "/academy")
+    elif welcome:
         db.add(Enrollment(employee_id=employee.id, course_id=welcome.id, assigned_by_user_id=hr.id,
                           due_date=start_date + timedelta(days=7)))
         notify(db, user.id, "course_assigned", f"Назначен курс: {welcome.title}", None, f"/academy/{welcome.id}")

@@ -9,6 +9,7 @@ from app.models import (
     AccountStatus, Candidate, CandidateStatus, Course, Employee, Enrollment, EnrollmentStatus, HRRequest, Lesson,
     QuizQuestion, RequestEvent, RequestStatus, RequestType, Role, User,
 )
+from app.seed_academy import seed_academy
 from app.services import request_workflow as wf
 from app.services.notifications import notify
 
@@ -213,6 +214,8 @@ def seed() -> None:
         ])
         _history(db, today, u, {"alia": alia, "daniyar": daniyar, "nurbol": nurbol, "anastasia": anastasia,
                                 "madina": madina, "head_log": head_log, "head_fin": head_fin, "hr": hr}, c1, c2)
+        seed_academy(db, today, u, {"alia": alia, "daniyar": daniyar, "nurbol": nurbol, "anastasia": anastasia,
+                                    "madina": madina, "head_log": head_log, "head_fin": head_fin, "hr": hr}, c1, c2)
         notify(db, u["employee"].id, "course_assigned", f"Назначен курс: {c1.title}", None, f"/academy/{c1.id}")
         notify(db, u["employee2"].id, "course_assigned", f"Назначен курс: {c2.title}", None, f"/academy/{c2.id}")
 

@@ -1,17 +1,30 @@
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Check, ClipboardCheck, Lock, Play, RotateCcw, Trophy } from "lucide-react";
 import { api } from "../api/client";
-import type { CourseDetail, Enrollment } from "../api/types";
+import type { CourseDetail, Enrollment, Rewards } from "../api/types";
+import { RewardLayer } from "../components/Game";
 import { Button, Card, Empty, ErrorText, ProgressBar } from "../components/ui";
 
+function inline(text: string): ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/).map((chunk, j) =>
+    chunk.startsWith("**") ? <b key={j}>{chunk.slice(2, -2)}</b> : <Fragment key={j}>{chunk}</Fragment>);
+}
+
 function renderText(text: string): ReactNode {
-  return text.split(/\n{2,}/).map((para, i) => (
-    <p key={i} className="mb-4 last:mb-0">
-      {para.split(/(\*\*[^*]+\*\*)/).map((chunk, j) =>
-        chunk.startsWith("**") ? <b key={j}>{chunk.slice(2, -2)}</b> : <Fragment key={j}>{chunk}</Fragment>)}
-    </p>
-  ));
+  return text.split(/\n{2,}/).map((para, i) => {
+    const lines = para.split("\n");
+    if (lines.every((l) => l.startsWith("- "))) {
+      return (
+        <ul key={i} className="mb-4 space-y-2 last:mb-0">
+          {lines.map((l, j) => (
+            <li key={j} className="flex gap-3"><span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-signal" /><span>{inline(l.slice(2))}</span></li>
+          ))}
+        </ul>
+      );
+    }
+    return <p key={i} className="mb-4 last:mb-0">{inline(para)}</p>;
+  });
 }
 
 export default function CourseView() {
@@ -23,6 +36,8 @@ export default function CourseView() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [reward, setReward] = useState<Rewards | null>(null);
+  const closeReward = useCallback(() => setReward(null), []);
 
   useEffect(() => {
     api.course(Number(id)).then((c) => {
@@ -50,6 +65,7 @@ export default function CourseView() {
     try {
       const e = await fn();
       setEnr(e);
+      if (e.rewards) setReward(e.rewards);
       return e;
     } catch (err) {
       setError((err as Error).message);
@@ -71,6 +87,7 @@ export default function CourseView() {
 
   return (
     <div className="space-y-6 pt-4">
+      <RewardLayer rewards={reward} onClose={closeReward} />
       <Link to="/academy" className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink">
         <ArrowLeft size={16} /> Jana Academy
       </Link>
@@ -143,6 +160,11 @@ export default function CourseView() {
                     ? "Результат сохранён в вашем профиле, HR и руководитель видят прогресс."
                     : "Повторите уроки и попробуйте ещё раз — попыток сколько угодно."}
                 </p>
+                {enr.status === "completed" && (
+                  <Link to="/academy" className="mt-6 inline-flex items-center gap-2 rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-forest-2">
+                    <Trophy size={16} className="text-signal" /> К траекториям и рейтингу
+                  </Link>
+                )}
                 {enr.status !== "completed" && (
                   <Button variant="dark" className="mt-6" onClick={() => { setAnswers({}); setShowResult(false); }}>
                     <RotateCcw size={16} /> Пройти тест ещё раз

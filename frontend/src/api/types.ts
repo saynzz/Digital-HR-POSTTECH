@@ -69,6 +69,14 @@ export interface Course {
   duration_min: number;
 }
 
+export interface Rewards {
+  xp: number;
+  items: { label: string; xp: number }[];
+  badges: { code: string; title: string; description: string; icon: string }[];
+  level_up: { level: number; title: string } | null;
+  tracks: string[];
+}
+
 export interface Enrollment {
   id: number;
   status: EnrollmentStatus;
@@ -76,7 +84,57 @@ export interface Enrollment {
   score: number | null;
   due_date: string | null;
   completed_lesson_ids: number[];
+  attempts?: number;
   course: Course;
+  rewards?: Rewards | null;
+}
+
+export interface GameProfile {
+  xp: number;
+  xp_week: number;
+  level: { level: number; title: string; xp_from: number; xp_to: number | null; next_title: string | null; progress: number };
+  levels: { level: number; xp: number; title: string }[];
+  streak: { current: number; best: number; today: boolean; days: { date: string; active: boolean }[] };
+  badges: { code: string; title: string; description: string; icon: string; earned_at: string | null }[];
+  recent: { title: string; xp: number; at: string }[];
+}
+
+export interface TrackStep {
+  order: number;
+  required: boolean;
+  locked: boolean;
+  course: Course;
+  status: EnrollmentStatus | null;
+  progress: number;
+  score: number | null;
+}
+
+export interface Track {
+  id: number;
+  slug: string;
+  title: string;
+  description: string;
+  audience: string;
+  icon: string;
+  xp_reward: number;
+  enrolled: boolean;
+  due_date: string | null;
+  completed_at: string | null;
+  progress: { required: number; required_done: number; done: number; total: number; progress: number; complete: boolean };
+  steps: TrackStep[];
+}
+
+export interface LeaderRow {
+  rank: number;
+  employee_id: number;
+  name: string;
+  department: string;
+  position: string;
+  xp: number;
+  level: number;
+  level_title: string;
+  streak: number;
+  me: boolean;
 }
 
 export interface CourseDetail extends Course {

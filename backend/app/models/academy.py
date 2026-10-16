@@ -63,6 +63,69 @@ class Enrollment(Base):
     due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     assigned_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
     completed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    reminded_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
 
     course: Mapped[Course] = relationship()
     employee = relationship("Employee")
+
+
+class Track(Base):
+    __tablename__ = "tracks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    slug: Mapped[str] = mapped_column(String(64), unique=True)
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(Text, default="")
+    audience: Mapped[str] = mapped_column(String(255), default="")
+    icon: Mapped[str] = mapped_column(String(32), default="route")
+    xp_reward: Mapped[int] = mapped_column(Integer, default=150)
+
+    steps: Mapped[list["TrackCourse"]] = relationship(order_by="TrackCourse.order", cascade="all, delete-orphan")
+
+
+class TrackCourse(Base):
+    __tablename__ = "track_courses"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    track_id: Mapped[int] = mapped_column(ForeignKey("tracks.id"), index=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
+    order: Mapped[int] = mapped_column(Integer)
+    required: Mapped[bool] = mapped_column(default=True)
+
+    course: Mapped[Course] = relationship()
+
+
+class TrackEnrollment(Base):
+    __tablename__ = "track_enrollments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True)
+    track_id: Mapped[int] = mapped_column(ForeignKey("tracks.id"))
+    assigned_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    assigned_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+
+    track: Mapped[Track] = relationship()
+
+
+class XpEvent(Base):
+    __tablename__ = "xp_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(32))
+    ref: Mapped[str] = mapped_column(String(64))
+    xp: Mapped[int] = mapped_column(Integer)
+    title: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
+
+
+class EarnedBadge(Base):
+    __tablename__ = "earned_badges"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True)
+    code: Mapped[str] = mapped_column(String(32))
+    earned_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)

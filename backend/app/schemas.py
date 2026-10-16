@@ -132,7 +132,40 @@ class EnrollmentOut(ORM):
     score: int | None
     due_date: date | None
     completed_lesson_ids: list[int]
+    attempts: int = 0
     course: CourseOut
+    rewards: dict[str, Any] | None = None
+
+
+class TrackStepOut(BaseModel):
+    order: int
+    required: bool
+    locked: bool
+    course: CourseOut
+    status: EnrollmentStatus | None = None
+    progress: int = 0
+    score: int | None = None
+
+
+class TrackOut(BaseModel):
+    id: int
+    slug: str
+    title: str
+    description: str
+    audience: str
+    icon: str
+    xp_reward: int
+    enrolled: bool
+    due_date: date | None = None
+    completed_at: datetime | None = None
+    progress: dict[str, Any]
+    steps: list[TrackStepOut]
+
+
+class AssignTrackIn(BaseModel):
+    employee_id: int
+    track_id: int
+    due_date: date | None = None
 
 
 class CourseDetail(CourseOut):

@@ -1,5 +1,5 @@
 import type {
-  Account, AgentCommands, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, HireResult,
+  Account, AgentCommands, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, GameProfile, HireResult, LeaderRow, Track,
   HRRequest, HRRequestDetail, InviteInfo, InviteResult, Me, Notification, RequestType,
 } from "./types";
 
@@ -87,6 +87,14 @@ export const api = {
     post<Enrollment>(`/academy/courses/${courseId}/quiz`, { answers }),
   assignCourse: (employee_id: number, course_id: number, due_date?: string) =>
     post<Enrollment>("/academy/assign", { employee_id, course_id, due_date }),
+  game: () => request<GameProfile>("/academy/game"),
+  tracks: () => request<Track[]>("/academy/tracks"),
+  track: (id: number) => request<Track>(`/academy/tracks/${id}`),
+  joinTrack: (id: number) => post<Track>(`/academy/tracks/${id}/join`),
+  assignTrack: (employee_id: number, track_id: number, due_date?: string) =>
+    post<Track>("/academy/tracks/assign", { employee_id, track_id, due_date }),
+  leaderboard: (scope: "team" | "company", period: "week" | "all") =>
+    request<{ rows: LeaderRow[] }>(`/academy/leaderboard?scope=${scope}&period=${period}`),
 
   ask: (question: string) => post<AskResponse>("/assistant/ask", { question }),
   escalate: (question: string) => post<{ ok: boolean }>("/assistant/escalate", { question }),

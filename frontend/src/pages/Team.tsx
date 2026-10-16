@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BarChart3, GraduationCap, Search, UserSearch } from "lucide-react";
 import { api } from "../api/client";
-import type { Course, Employee, HRRequest } from "../api/types";
+import type { Course, Employee, HRRequest, Track } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import RequestRow from "../components/RequestRow";
 import { Button, Card, Empty, ErrorText, Field, Modal, PageHeader, fmtDate, inputCls, pluralRu } from "../components/ui";
@@ -103,7 +103,7 @@ export default function Team() {
                     <UserSearch size={16} /> Досье
                   </Button>
                   <Button variant="light" onClick={() => setAssignTo(p)}>
-                    <GraduationCap size={16} /> Курс
+                    <GraduationCap size={16} /> Обучение
                   </Button>
                 </div>
               </div>
@@ -118,8 +118,10 @@ export default function Team() {
 }
 
 function AssignCourse({ employee, onClose }: { employee: Employee | null; onClose: () => void }) {
+  const [mode, setMode] = useState<"track" | "course">("track");
   const [courses, setCourses] = useState<Course[]>([]);
-  const [courseId, setCourseId] = useState<number | null>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [pick, setPick] = useState<number | null>(null);
   const [due, setDue] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,19 +131,21 @@ function AssignCourse({ employee, onClose }: { employee: Employee | null; onClos
     if (!employee) return;
     setDone(false);
     setError(null);
-    setCourseId(null);
+    setPick(null);
     const d = new Date();
     d.setDate(d.getDate() + 14);
     setDue(d.toISOString().slice(0, 10));
     api.catalog().then(setCourses);
+    api.tracks().then(setTracks);
   }, [employee]);
 
   const submit = async () => {
-    if (!employee || !courseId) return;
+    if (!employee || !pick) return;
     setBusy(true);
     setError(null);
     try {
-      await api.assignCourse(employee.id, courseId, due || undefined);
+      if (mode === "track") await api.assignTrack(employee.id, pick, due || undefined);
+      else await api.assignCourse(employee.id, pick, due || undefined);
       setDone(true);
     } catch (e) {
       setError((e as Error).message);
@@ -150,12 +154,16 @@ function AssignCourse({ employee, onClose }: { employee: Employee | null; onClos
     }
   };
 
+  const items = mode === "track"
+    ? tracks.map((t) => ({ id: t.id, title: t.title, sub: `${t.steps.length} ${pluralRu(t.steps.length, ["курс", "курса", "курсов"])} · ${t.audience} · +${t.xp_reward} XP` }))
+    : courses.map((c) => ({ id: c.id, title: c.title, sub: `${c.duration_min} мин · ${c.description}` }));
+
   return (
-    <Modal open={!!employee} onClose={onClose} title={done ? "Курс назначен" : "Назначить курс"}
+    <Modal open={!!employee} onClose={onClose} title={done ? "Обучение назначено" : "Назначить обучение"}
       footer={done ? <Button variant="dark" onClick={onClose}>Готово</Button> : (
         <>
           <Button variant="light" onClick={onClose}>Отмена</Button>
-          <Button variant="dark" disabled={!courseId || busy} onClick={submit}>Назначить</Button>
+          <Button variant="dark" disabled={!pick || busy} onClick={submit}>Назначить</Button>
         </>
       )}>
       {employee && (done ? (
@@ -163,14 +171,20 @@ function AssignCourse({ employee, onClose }: { employee: Employee | null; onClos
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-muted">Сотрудник: <b className="text-ink">{employee.full_name}</b></p>
+          <div className="flex rounded-full bg-paper p-1">
+            {([["track", "Траектория"], ["course", "Отдельный курс"]] as const).map(([k, l]) => (
+              <button key={k} onClick={() => { setMode(k); setPick(null); }}
+                className={`flex-1 rounded-full px-3 py-2 text-sm font-semibold transition ${mode === k ? "bg-forest text-white" : "text-muted"}`}>{l}</button>
+            ))}
+          </div>
           <div className="space-y-2">
-            {courses.map((c) => (
+            {items.map((c) => (
               <label key={c.id} className={`flex cursor-pointer items-start gap-3 rounded-[18px] border-2 p-4 transition ${
-                courseId === c.id ? "border-forest bg-paper" : "border-line hover:border-forest/40"}`}>
-                <input type="radio" name="course" className="mt-1 accent-[var(--color-forest)]" checked={courseId === c.id} onChange={() => setCourseId(c.id)} />
+                pick === c.id ? "border-forest bg-paper" : "border-line hover:border-forest/40"}`}>
+                <input type="radio" name="pick" className="mt-1 accent-[var(--color-forest)]" checked={pick === c.id} onChange={() => setPick(c.id)} />
                 <span>
                   <span className="block font-semibold">{c.title}</span>
-                  <span className="block text-xs text-muted">{c.duration_min} мин · {c.description}</span>
+                  <span className="block text-xs text-muted">{c.sub}</span>
                 </span>
               </label>
             ))}
