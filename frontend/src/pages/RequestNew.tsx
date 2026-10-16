@@ -1,11 +1,11 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useCallback, useMemo, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowRight, Banknote, Palmtree, Send } from "lucide-react";
+import { Banknote, Palmtree, Send } from "lucide-react";
 import { api } from "../api/client";
 import type { RequestType } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
-import DeliveryScene, { type VanPhase } from "../components/DeliveryVan";
-import { Card, ErrorText, Field, PageHeader, fmtMoney, inputCls, pluralRu } from "../components/ui";
+import { DeliveryScene, DispatchOverlay, type VanPhase } from "../components/DeliveryVan";
+import { Card, ErrorText, Field, PageHeader, fmtMoney, fmtShortDate, inputCls, pluralRu } from "../components/ui";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -23,6 +23,8 @@ export default function RequestNew() {
   const [comment, setComment] = useState("");
   const [phase, setPhase] = useState<VanPhase>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [dispatching, setDispatching] = useState(false);
+  const [createdId, setCreatedId] = useState<number | null>(null);
 
   const today = iso(new Date());
   const balance = user?.employee.vacation_balance_days ?? 0;
@@ -32,9 +34,13 @@ export default function RequestNew() {
     return d > 0 ? Math.round(d) : 0;
   }, [start, end]);
 
+  const finish = useCallback(() => {
+    if (createdId !== null) navigate(`/requests/${createdId}?sent=1`, { replace: true });
+  }, [createdId, navigate]);
+
   if (!user) return null;
   const e = user.employee;
-  const busy = phase !== "idle" && phase !== "error";
+  const busy = phase === "sending";
 
   const problem = type === "vacation"
     ? !start || !end ? "Укажите даты отпуска"
@@ -48,24 +54,34 @@ export default function RequestNew() {
     ev.preventDefault();
     if (problem || busy) return;
     setError(null);
-    setPhase("loading");
+    setPhase("sending");
     const fast = reduced();
+    if (!fast) setDispatching(true);
     try {
       const data = type === "vacation"
         ? { start_date: start, end_date: end, comment: comment || null }
         : { amount: Number(amount), comment: comment || null };
-      const [created] = await Promise.all([api.createRequest(type, data), sleep(fast ? 0 : 700)]);
-      setPhase("driving");
-      await sleep(fast ? 300 : 1350);
+      const created = await api.createRequest(type, data);
       refresh();
-      navigate(`/requests/${created.id}?sent=1`, { replace: true });
+      if (fast) navigate(`/requests/${created.id}?sent=1`, { replace: true });
+      else setCreatedId(created.id);
     } catch (err) {
+      setDispatching(false);
       setPhase("error");
       setError((err as Error).message);
       await sleep(900);
       setPhase("idle");
     }
   };
+
+  const parcelLabel = type === "vacation" ? (days ? `${days} ${pluralRu(days, ["день", "дня", "дней"])}` : "Отпуск") : "Аванс";
+  const parcelSub = type === "vacation"
+    ? (start && end && days > 0 ? `${fmtShortDate(start)} – ${fmtShortDate(end)}` : undefined)
+    : (Number(amount) > 0 ? fmtMoney(Number(amount)) : undefined);
+  const caption = phase === "error" ? "Не получилось отправить — проверьте накладную"
+    : problem ? "Заполните накладную — фургон ждёт посылку"
+    : "Посылка готова. Жмите «Отправить заявку»";
+  const stops = [...(e.manager ? ["Руководитель"] : []), "HR", "1С:ЗУП"];
 
   const route = [
     { label: "Вы", sub: e.full_name.split(" ").slice(0, 2).join(" ") },
@@ -78,7 +94,11 @@ export default function RequestNew() {
     <div>
       <PageHeader title="Новая заявка" subtitle="Заполните накладную — и заявка отправится по маршруту. Статус будет виден на каждом этапе." />
 
-      <form onSubmit={submit} className="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="mb-6">
+        <DeliveryScene phase={phase} type={type} label={parcelLabel} sub={parcelSub} caption={caption} />
+      </div>
+
+      <form onSubmit={submit} className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <Card className="!p-0 overflow-hidden">
           <div className="flex items-center justify-between bg-signal px-6 py-3">
             <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-forest">НАКЛАДНАЯ · JANA POST</span>
@@ -157,8 +177,6 @@ export default function RequestNew() {
         </Card>
 
         <div className="space-y-4 lg:sticky lg:top-24">
-          <DeliveryScene phase={phase} type={type} label={type === "vacation" ? (days ? `${days} дн.` : "Отпуск") : "Аванс"} />
-
           <Card>
             <p className="mb-4 font-display text-[15px] font-semibold">Маршрут заявки</p>
             <ol className="relative space-y-4">
@@ -180,10 +198,14 @@ export default function RequestNew() {
 
           <button type="submit" disabled={!!problem || busy}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-forest px-6 py-4 text-[16px] font-semibold text-white transition hover:bg-forest-2 disabled:opacity-40">
-            {phase === "loading" ? "Грузим в фургон…" : phase === "driving" ? <>В пути <ArrowRight size={18} /></> : <><Send size={18} /> Отправить заявку</>}
+            {busy ? "Отправляем…" : <><Send size={18} /> Отправить заявку</>}
           </button>
         </div>
       </form>
+
+      {dispatching && (
+        <DispatchOverlay type={type} label={parcelLabel} sub={parcelSub} stops={stops} requestId={createdId} onFinish={finish} />
+      )}
     </div>
   );
 }

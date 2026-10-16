@@ -71,53 +71,87 @@ body {
   .route-current, .pass-in, .route-fill, .route-pop, .route-flow { animation: none; }
 }
 
-.road-dashes {
-  background: repeating-linear-gradient(90deg, rgb(242 194 48 / 0.55) 0 26px, transparent 26px 52px);
-}
-.is-driving .road-dashes { animation: road-move 0.35s linear infinite; }
-@keyframes road-move { to { background-position: -52px 0; } }
-
-.van-idle { animation: van-idle 2.4s ease-in-out infinite; }
-@keyframes van-idle { 50% { transform: translateY(-2px); } }
-
 .wheel { transform-box: fill-box; transform-origin: center; }
-.van-drive .wheel { animation: wheel-spin 0.35s linear infinite; }
+.van-moving .wheel { animation: wheel-spin 0.32s linear infinite; }
 @keyframes wheel-spin { to { transform: rotate(360deg); } }
 
-.van-drive { animation: van-drive 1.35s cubic-bezier(.55,0,.8,.4) forwards; }
-@keyframes van-drive {
-  0% { transform: translateX(0) rotate(0); }
-  12% { transform: translateX(-10px) rotate(0.8deg); }
-  100% { transform: translateX(120vw) rotate(-1deg); }
+.beam { opacity: 0; transition: opacity 0.4s; }
+.van-moving .beam { opacity: 1; animation: beam-flicker 1.6s ease-in-out infinite; }
+@keyframes beam-flicker { 50% { opacity: 0.75; } }
+
+.rear-door { transform-box: fill-box; transform-origin: left center; transition: transform 0.35s cubic-bezier(.3,1.4,.5,1); }
+.rear-door.is-open { transform: perspective(300px) rotateY(-70deg) translateX(-2px); }
+.van-hold { opacity: 0; transition: opacity 0.2s; }
+.van-hold.is-open { opacity: 1; }
+
+.van-idle { animation: van-idle 1.8s ease-in-out infinite; }
+@keyframes van-idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.parcel-idle { animation: parcel-idle 3s ease-in-out infinite; }
+@keyframes parcel-idle { 50% { transform: translateY(-4px) rotate(-2deg); } }
+.parcel-pop { animation: parcel-pop 0.45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes parcel-pop { 0% { transform: scale(0.7); } 100% { transform: scale(1); } }
+
+.cloud { animation: cloud-drift 18s ease-in-out infinite alternate; }
+.cloud-2 { animation-duration: 24s; animation-direction: alternate-reverse; }
+@keyframes cloud-drift { to { transform: translateX(60px); } }
+
+.lane { background: repeating-linear-gradient(90deg, rgb(242 194 48 / 0.75) 0 46px, transparent 46px 92px); }
+.lane.is-moving { animation: lane-move 0.22s linear infinite; }
+@keyframes lane-move { to { background-position: -92px 0; } }
+
+.city-layer.is-moving-far { animation: city-move 7s linear infinite; }
+.city-layer.is-moving-near { animation: city-move 3s linear infinite; }
+.city-layer.is-moving-slow { animation: city-move 90s linear infinite; }
+.city-layer.is-moving-slow2 { animation: city-move 50s linear infinite; }
+@keyframes city-move { to { transform: translateX(-50%); } }
+
+.star { animation: twinkle 2.4s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: 0.2; } }
+
+.van-arrive { animation: van-arrive 0.7s cubic-bezier(.2,.9,.3,1.1) both; }
+@keyframes van-arrive { from { transform: translate(-130%, 0); } to { transform: translate(-50%, 0); } }
+.van-drive-loop { transform: translateX(-50%); }
+.van-moving { animation: van-bounce 0.36s ease-in-out infinite; }
+@keyframes van-bounce { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-3px) rotate(-0.4deg); } 60% { transform: translateY(1px) rotate(0.3deg); } }
+.van-exit { animation: van-exit 0.75s cubic-bezier(.6,0,.9,.5) forwards; }
+@keyframes van-exit {
+  0% { transform: translate(-50%, 0) rotate(0); }
+  20% { transform: translate(-56%, 0) rotate(1.5deg); }
+  100% { transform: translate(140vw, 0) rotate(-2deg); }
 }
 
-.exhaust { opacity: 0; }
-.van-drive .exhaust { opacity: 1; }
-.van-drive .puff { animation: puff 0.6s ease-out infinite; }
-.van-drive .puff-2 { animation-delay: 0.2s; }
-.van-drive .puff-3 { animation-delay: 0.4s; }
+.exhaust .puff { animation: puff 0.55s ease-out infinite; }
+.exhaust .puff-2 { animation-delay: 0.18s; }
+.exhaust .puff-3 { animation-delay: 0.36s; }
 @keyframes puff {
-  from { transform: translate(0, 0) scale(0.6); opacity: 0.9; }
-  to { transform: translate(-26px, -10px) scale(1.6); opacity: 0; }
+  from { transform: translate(0, 0) scale(0.5); opacity: 0.9; }
+  to { transform: translate(-46px, -16px) scale(1.9); opacity: 0; }
 }
 
-.van-door { transform-box: fill-box; transform-origin: left center; transition: transform 0.25s ease; }
-.door-open { transform: scaleX(-2.4); }
+.signpost { animation: sign-pass 1.9s linear both; }
+@keyframes sign-pass { from { transform: translateX(110%); } to { transform: translateX(-115vw); } }
 
-.parcel-load { animation: parcel-load 0.7s cubic-bezier(.3,.7,.4,1) forwards; }
-@keyframes parcel-load {
-  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
-  45% { transform: translate(52px, -46px) rotate(-12deg); opacity: 1; }
-  100% { transform: translate(112px, -6px) rotate(0) scale(0.35); opacity: 0; }
+.speed-line { animation: speed-line 0.4s linear infinite; }
+@keyframes speed-line { from { transform: translateX(110vw); opacity: 0; } 30% { opacity: 1; } to { transform: translateX(-60vw); opacity: 0; } }
+
+.parcel-drop { animation: parcel-drop 0.6s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes parcel-drop { from { transform: translate(-50%, -140%) rotate(-10deg); } to { transform: translate(-50%, 0) rotate(0); } }
+.stamp { animation: stamp-hit 0.35s cubic-bezier(.2,1.6,.4,1) 0.45s both; }
+@keyframes stamp-hit { from { transform: scale(3) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(-14deg); opacity: 1; } }
+.parcel-fly { animation: parcel-fly 0.65s cubic-bezier(.5,0,.7,.4) forwards; }
+@keyframes parcel-fly {
+  0% { transform: translate(-50%, 0) scale(1) rotate(0); opacity: 1; }
+  40% { transform: translate(-90%, -8vh) scale(0.8) rotate(-18deg); opacity: 1; }
+  100% { transform: translate(min(-170%, -36vw), 38vh) scale(0.2) rotate(-40deg); opacity: 0; }
 }
+
+.done-card { animation: done-pop 0.5s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes done-pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 .van-shake { animation: van-shake 0.45s ease-in-out 2; }
-@keyframes van-shake {
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
+@keyframes van-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 .parcel-bounce { animation: parcel-bounce 0.5s ease-out; }
-@keyframes parcel-bounce { 40% { transform: translateY(-16px); } }
+@keyframes parcel-bounce { 40% { transform: translateY(-18px); } }
 
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(10px); }
@@ -131,7 +165,6 @@ body {
 .typing-dot:nth-child(3) { animation-delay: 0.3s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .van-idle, .van-drive .wheel, .van-drive .puff, .is-driving .road-dashes, .parcel-load,
-  .van-shake, .parcel-bounce, .rise-in, .typing-dot { animation: none; }
-  .van-drive { animation: none; opacity: 0; }
+  .van-idle, .parcel-idle, .parcel-pop, .cloud, .city-layer, .lane, .van-shake, .parcel-bounce,
+  .rise-in, .typing-dot, .star { animation: none !important; }
 }
