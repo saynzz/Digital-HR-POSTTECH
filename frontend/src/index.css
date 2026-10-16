@@ -7,9 +7,58 @@
   --color-brand-600: #2f8a22;
   --color-brand-700: #24701a;
   --color-ink: #17251a;
+
+  --color-forest: #0f3a22;
+  --color-forest-2: #164a2d;
+  --color-paper: #edf0e8;
+  --color-line: #d9dfd2;
+  --color-muted: #5b685d;
+  --color-signal: #f2c230;
+  --color-signal-50: #fcf3d4;
+  --color-signal-ink: #6b4f00;
+  --color-danger: #c2412d;
+  --color-danger-50: #f9e7e3;
+
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Onest Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Unbounded Variable", "Onest Variable", system-ui, sans-serif;
 }
 
 body {
   @apply bg-gray-50 text-ink antialiased;
+}
+
+.app-shell {
+  font-family: var(--font-body);
+  background: var(--color-paper);
+}
+
+.app-shell :focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.perforated {
+  -webkit-mask: radial-gradient(circle 7px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+                radial-gradient(circle 7px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+          mask: radial-gradient(circle 7px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+                radial-gradient(circle 7px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+}
+
+@keyframes route-pulse {
+  0% { box-shadow: 0 0 0 0 rgb(242 194 48 / 0.6); }
+  70% { box-shadow: 0 0 0 8px rgb(242 194 48 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(242 194 48 / 0); }
+}
+.route-current { animation: route-pulse 2.2s ease-out infinite; }
+
+@keyframes pass-in {
+  from { opacity: 0; transform: translateY(18px) rotate(0deg); }
+  to { opacity: 1; transform: translateY(0) rotate(-3deg); }
+}
+.pass-in { animation: pass-in 0.7s cubic-bezier(.2,.8,.2,1) both 0.1s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .route-current, .pass-in { animation: none; }
 }

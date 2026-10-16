@@ -58,8 +58,8 @@ export default function CandidateForm({ open, candidate, employees, onClose, onS
   return (
     <Modal open={open} onClose={onClose} wide title={candidate ? "Редактировать кандидата" : "Новый кандидат"}
       footer={<>
-        <Button variant="secondary" onClick={onClose}>Отмена</Button>
-        <Button type="submit" form="candidate-form" disabled={busy}>{candidate ? "Сохранить" : "Добавить"}</Button>
+        <Button variant="light" onClick={onClose}>Отмена</Button>
+        <Button variant="dark" type="submit" form="candidate-form" disabled={busy}>{candidate ? "Сохранить" : "Добавить"}</Button>
       </>}>
       <form id="candidate-form" onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">

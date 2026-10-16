@@ -50,21 +50,21 @@ export default function Candidates() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-56 flex-1">
-          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Поиск по ФИО, email, должности"
-            className="w-full rounded-xl border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-500" />
+            className="w-full rounded-full border border-transparent bg-white py-3 pl-11 pr-4 text-[15px] outline-none focus:border-forest" />
         </div>
-        <Button onClick={() => { setEditing(null); setFormOpen(true); }}><Plus size={16} /> Добавить кандидата</Button>
+        <Button variant="dark" onClick={() => { setEditing(null); setFormOpen(true); }}><Plus size={16} /> Добавить кандидата</Button>
       </div>
 
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
         {FILTERS.map((f) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition ${
-              filter === f ? "border-brand-600 bg-brand-600 text-white" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+            className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition ${
+              filter === f ? "border-forest bg-forest text-white" : "border-transparent text-muted hover:bg-white hover:text-ink"
             }`}>
             {f === "all" ? "Все" : CANDIDATE_STATUS[f].label}
-            <span className={`ml-1.5 ${filter === f ? "text-white/80" : "text-gray-400"}`}>{counts[f] ?? 0}</span>
+            <span className={`ml-1.5 ${filter === f ? "text-white/60" : "text-gray-400"}`}>{counts[f] ?? 0}</span>
           </button>
         ))}
       </div>
@@ -73,7 +73,7 @@ export default function Candidates() {
         {items === null ? <Empty>Загрузка…</Empty> : visible.length === 0 ? <Empty>Кандидатов нет</Empty> : (
           <>
             <table className="hidden w-full text-sm md:table">
-              <thead className="border-b border-gray-100 bg-gray-50 text-left text-xs uppercase text-gray-500">
+              <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
                 <tr>
                   <th className="px-5 py-3">Кандидат</th>
                   <th className="px-3 py-3">Должность</th>
@@ -81,33 +81,33 @@ export default function Candidates() {
                   <th className="px-5 py-3">Статус</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-line">
                 {visible.map((c) => (
-                  <tr key={c.id} onClick={() => setOpened(c)} className="cursor-pointer hover:bg-gray-50">
+                  <tr key={c.id} onClick={() => setOpened(c)} className="cursor-pointer hover:bg-paper/60">
                     <td className="px-5 py-3">
                       <p className="font-medium">{c.full_name}</p>
-                      <p className="text-xs text-gray-500">{c.email}</p>
+                      <p className="text-xs text-muted">{c.email}</p>
                     </td>
                     <td className="px-3 py-3">
                       <p>{c.position}</p>
-                      <p className="text-xs text-gray-500">{c.department}</p>
+                      <p className="text-xs text-muted">{c.department}</p>
                     </td>
-                    <td className="px-3 py-3 text-gray-600">{c.interview_at ? fmtDateTime(c.interview_at) : "—"}</td>
+                    <td className="px-3 py-3 text-muted">{c.interview_at ? fmtDateTime(c.interview_at) : "—"}</td>
                     <td className="px-5 py-3"><CandidateBadge status={c.status} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <ul className="divide-y divide-gray-100 md:hidden">
+            <ul className="divide-y divide-line md:hidden">
               {visible.map((c) => (
                 <li key={c.id}>
-                  <button onClick={() => setOpened(c)} className="w-full px-4 py-3 text-left hover:bg-gray-50">
+                  <button onClick={() => setOpened(c)} className="w-full px-4 py-3 text-left hover:bg-paper/60">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-medium">{c.full_name}</p>
                       <CandidateBadge status={c.status} />
                     </div>
-                    <p className="text-sm text-gray-600">{c.position} · {c.department}</p>
-                    {c.interview_at && <p className="text-xs text-gray-500">Собеседование: {fmtDateTime(c.interview_at)}</p>}
+                    <p className="text-sm text-muted">{c.position} · {c.department}</p>
+                    {c.interview_at && <p className="text-xs text-muted">Собеседование: {fmtDateTime(c.interview_at)}</p>}
                   </button>
                 </li>
               ))}

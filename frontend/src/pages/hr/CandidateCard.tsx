@@ -76,17 +76,17 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
     footer = (
       <>
         {c.status === "archived" && (
-          <Button variant="secondary" disabled={busy} onClick={() => run(() => api.restoreCandidate(c.id))}>
+          <Button variant="light" disabled={busy} onClick={() => run(() => api.restoreCandidate(c.id))}>
             <RotateCcw size={16} /> Вернуть в работу
           </Button>
         )}
         {editable && (
-          <Button variant="secondary" disabled={busy} onClick={() => run(() => api.archiveCandidate(c.id, comment))}>
+          <Button variant="light" disabled={busy} onClick={() => run(() => api.archiveCandidate(c.id, comment))}>
             <Archive size={16} /> Открепить
           </Button>
         )}
         {c.status === "interview_passed" && (
-          <Button disabled={busy} onClick={() => { setError(null); setStep("hire"); }}>
+          <Button variant="dark" disabled={busy} onClick={() => { setError(null); setStep("hire"); }}>
             <UserPlus size={16} /> Трудоустроить
           </Button>
         )}
@@ -95,12 +95,12 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
   } else if (step === "hire") {
     footer = (
       <>
-        <Button variant="secondary" onClick={() => setStep("view")}>Назад</Button>
-        <Button disabled={busy || !startDate} onClick={doHire}><UserPlus size={16} /> Трудоустроить и отправить ссылку</Button>
+        <Button variant="light" onClick={() => setStep("view")}>Назад</Button>
+        <Button variant="dark" disabled={busy || !startDate} onClick={doHire}><UserPlus size={16} /> Трудоустроить и отправить ссылку</Button>
       </>
     );
   } else {
-    footer = <Button onClick={onClose}>Готово</Button>;
+    footer = <Button variant="dark" onClick={onClose}>Готово</Button>;
   }
 
   return (
@@ -121,39 +121,39 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
           </dl>
           {c.notes && (
             <div>
-              <p className="text-xs font-semibold uppercase text-gray-400">Заметки HR</p>
+              <p className="text-xs font-semibold uppercase text-muted">Заметки HR</p>
               <p className="mt-1 whitespace-pre-line text-sm">{c.notes}</p>
             </div>
           )}
           {c.status_comment && (
-            <div className="rounded-xl bg-gray-50 px-3 py-2 text-sm">
-              <span className="text-gray-500">Комментарий к статусу: </span>{c.status_comment}
+            <div className="rounded-2xl bg-paper px-4 py-2.5 text-sm">
+              <span className="text-muted">Комментарий к статусу: </span>{c.status_comment}
             </div>
           )}
 
           {canDecide && (
-            <div className="rounded-2xl border border-gray-200 p-4">
+            <div className="rounded-[20px] bg-paper p-4">
               <p className="mb-3 text-sm font-semibold">Результат собеседования</p>
               <div className="flex flex-wrap gap-2">
                 {c.status !== "interview_passed" && (
-                  <Button variant="secondary" disabled={busy}
+                  <Button variant="light" disabled={busy}
                     onClick={() => run(() => api.setCandidateStatus(c.id, "interview_passed", comment))}>
                     <CheckCircle2 size={16} className="text-brand-600" /> Прошёл
                   </Button>
                 )}
                 {c.status !== "interview_failed" && (
-                  <Button variant="secondary" disabled={busy}
+                  <Button variant="light" disabled={busy}
                     onClick={() => run(() => api.setCandidateStatus(c.id, "interview_failed", comment))}>
-                    <XCircle size={16} className="text-red-600" /> Не прошёл
+                    <XCircle size={16} className="text-danger" /> Не прошёл
                   </Button>
                 )}
                 {c.status !== "interview_pending" && (
-                  <Button variant="secondary" disabled={busy}
+                  <Button variant="light" disabled={busy}
                     onClick={() => run(() => api.setCandidateStatus(c.id, "interview_pending", comment))}>
                     <RotateCcw size={16} /> Вернуть в ожидание
                   </Button>
                 )}
-                <Button variant="secondary" disabled={busy} onClick={() => onEdit(c)}>
+                <Button variant="light" disabled={busy} onClick={() => onEdit(c)}>
                   <Pencil size={16} /> Редактировать
                 </Button>
               </div>
@@ -163,7 +163,7 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
           )}
 
           {c.status === "hired" && (
-            <p className="rounded-xl bg-blue-50 px-3 py-2 text-sm text-blue-800">
+            <p className="rounded-2xl bg-forest px-4 py-3 text-sm text-white">
               Сотрудник оформлен. Управлять доступом можно во вкладке «Доступы».
             </p>
           )}
@@ -173,7 +173,7 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
 
       {step === "hire" && (
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted">
             Будет создана запись сотрудника в 1С:ЗУП и учётная запись в JanaMen. На <b>{c.email}</b> уйдёт
             одноразовая ссылка, по которой сотрудник сам придумает пароль.
           </p>
@@ -207,7 +207,7 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-gray-500">{label}</dt>
+      <dt className="text-muted">{label}</dt>
       <dd className="font-medium break-words">{value}</dd>
     </div>
   );

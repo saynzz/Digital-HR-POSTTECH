@@ -42,14 +42,14 @@ export default function Accounts() {
   return (
     <div className="space-y-4">
       <div className="relative">
-        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Поиск по ФИО, email, подразделению"
-          className="w-full rounded-xl border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-500" />
+          className="w-full rounded-full border border-transparent bg-white py-3 pl-11 pr-4 text-[15px] outline-none focus:border-forest" />
       </div>
       <ErrorText>{error}</ErrorText>
       <Card className="!p-0 overflow-hidden">
         {items === null ? <Empty>Загрузка…</Empty> : visible.length === 0 ? <Empty /> : (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-line">
             {visible.map((a) => {
               const self = a.user_id === user?.id;
               const busy = busyId === a.user_id;
@@ -59,11 +59,11 @@ export default function Accounts() {
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium">{a.employee.full_name}</p>
                       <AccountBadge status={a.status} />
-                      <span className="text-xs text-gray-400">{t(`role.${a.role}`)}</span>
+                      <span className="text-xs text-muted">{t(`role.${a.role}`)}</span>
                     </div>
-                    <p className="truncate text-sm text-gray-500">{a.email} · {a.employee.department}</p>
+                    <p className="truncate text-sm text-muted">{a.email} · {a.employee.department}</p>
                     {a.status === "invited" && a.invite_sent_at && (
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-muted">
                         {a.invite_pending
                           ? `Ссылка отправлена ${fmtDateTime(a.invite_sent_at)}, действует до ${fmtDateTime(a.invite_expires_at!)}`
                           : "Срок ссылки истёк — отправьте новую"}
@@ -73,21 +73,21 @@ export default function Accounts() {
                   {!self && (
                     <div className="flex flex-wrap gap-2">
                       {a.status === "invited" && (
-                        <Button variant="secondary" disabled={busy} onClick={() => act(a, () => api.sendInvite(a.user_id))}>
+                        <Button variant="light" disabled={busy} onClick={() => act(a, () => api.sendInvite(a.user_id))}>
                           <Send size={16} /> Отправить ссылку
                         </Button>
                       )}
                       {a.status === "active" && (
-                        <Button variant="secondary" disabled={busy} onClick={() => act(a, () => api.sendInvite(a.user_id))}>
+                        <Button variant="light" disabled={busy} onClick={() => act(a, () => api.sendInvite(a.user_id))}>
                           <KeyRound size={16} /> Сбросить пароль
                         </Button>
                       )}
                       {a.status !== "blocked" ? (
-                        <Button variant="secondary" disabled={busy} onClick={() => act(a, () => api.blockAccount(a.user_id))}>
-                          <Ban size={16} className="text-red-600" /> Заблокировать
+                        <Button variant="light" disabled={busy} onClick={() => act(a, () => api.blockAccount(a.user_id))}>
+                          <Ban size={16} className="text-danger" /> Заблокировать
                         </Button>
                       ) : (
-                        <Button variant="secondary" disabled={busy} onClick={() => act(a, () => api.unblockAccount(a.user_id))}>
+                        <Button variant="light" disabled={busy} onClick={() => act(a, () => api.unblockAccount(a.user_id))}>
                           <Unlock size={16} /> Разблокировать
                         </Button>
                       )}
@@ -101,7 +101,7 @@ export default function Accounts() {
       </Card>
 
       <Modal open={!!invite} onClose={() => setInvite(null)} title={invite?.account.status === "active" ? "Ссылка для сброса пароля" : "Ссылка для создания пароля"}
-        footer={<Button onClick={() => setInvite(null)}>Готово</Button>}>
+        footer={<Button variant="dark" onClick={() => setInvite(null)}>Готово</Button>}>
         {invite && (
           <div className="space-y-3">
             <p className="text-sm">{invite.account.employee.full_name}. Предыдущие ссылки больше не действуют.</p>

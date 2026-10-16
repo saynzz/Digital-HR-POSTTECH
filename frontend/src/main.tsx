@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
 import { I18nProvider } from "./i18n";
+import "@fontsource-variable/onest";
+import "@fontsource-variable/unbounded";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(

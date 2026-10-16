@@ -4,6 +4,16 @@ Jana Post × Terricon Valley Hackathon 2026 · **Challenge 02 / Digital HR**
 
 Один вход, а в нём профиль, HR-заявки, обучение (Jana Academy), AI-ассистент (AI Jana) и уведомления.
 
+## Быстрый старт без Docker (macOS)
+
+Нужны Python 3.10–3.13 и Node.js 18+ (`brew install python@3.13 node`).
+
+```bash
+./start.sh
+```
+
+Скрипт сам поставит зависимости и поднимет бэкенд (:8000, SQLite) и фронт: http://localhost:5173. AI Jana в этом режиме отвечает цитатами из базы знаний. Остановить — Ctrl+C.
+
 ## Быстрый старт (Docker)
 
 Нужен Docker Desktop. Для локальной модели выделите ему **не меньше 6 ГБ RAM**: Settings → Resources.
@@ -165,6 +175,7 @@ frontend/
     i18n/              # словари RU/KZ
     pages/
 docs/ARCHITECTURE.md   # схема и места интеграций
+docs/DESIGN.md         # дизайн-система кабинета
 TASKS.md               # распределение задач в команде
 ```
 
