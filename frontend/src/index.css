@@ -54,13 +54,21 @@ body {
 .route-current { animation: route-pulse 2.2s ease-out infinite; }
 
 @keyframes pass-in {
-  from { opacity: 0; transform: translateY(18px) rotate(0deg); }
-  to { opacity: 1; transform: translateY(0) rotate(-3deg); }
+  from { opacity: 0; translate: 0 24px; }
+  to { opacity: 1; translate: 0 0; }
 }
 .pass-in { animation: pass-in 0.7s cubic-bezier(.2,.8,.2,1) both 0.1s; }
 
+@keyframes route-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.route-fill { transform-origin: left center; animation: route-fill 0.45s ease-out both; }
+@keyframes route-pop { 0% { transform: scale(0.4); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.route-pop { animation: route-pop 0.35s ease-out both; }
+
+@keyframes route-flow { to { stroke-dashoffset: -240; } }
+.route-flow { animation: route-flow 14s linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .route-current, .pass-in { animation: none; }
+  .route-current, .pass-in, .route-fill, .route-pop, .route-flow { animation: none; }
 }
 
 .road-dashes {

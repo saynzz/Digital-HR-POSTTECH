@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useCountUp } from "../components/useCountUp";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Banknote, Bot, Palmtree } from "lucide-react";
 import { api } from "../api/client";
@@ -45,7 +46,7 @@ export default function Dashboard() {
             </h1>
 
             <div className="mt-8 flex items-end gap-4">
-              <span className="font-display text-[88px] font-bold leading-[0.8] tracking-[-0.06em] text-signal sm:text-[112px]">{n}</span>
+              <span className="font-display text-[88px] font-bold leading-[0.8] tracking-[-0.06em] text-signal tabular-nums sm:text-[112px]"><CountUp to={n} /></span>
               <span className="pb-1 text-[17px] leading-snug text-white/80">
                 {lang === "kz" ? <>күн демалыс<br />қалды</> : <>{pluralRu(n, ["день", "дня", "дней"])} отпуска<br />в запасе</>}
               </span>
@@ -139,11 +140,15 @@ export default function Dashboard() {
 function RouteBackdrop() {
   return (
     <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1000 420" preserveAspectRatio="xMidYMid slice" aria-hidden>
-      <path d="M-20 360 C 180 300, 260 120, 470 160 S 760 380, 1020 90" fill="none" stroke="rgb(255 255 255 / 0.10)" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" />
-      <path d="M-20 60 C 220 110, 380 20, 560 70 S 860 10, 1020 40" fill="none" stroke="rgb(255 255 255 / 0.06)" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" />
+      <path d="M-20 360 C 180 300, 260 120, 470 160 S 760 380, 1020 90" fill="none" stroke="rgb(255 255 255 / 0.10)" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" className="route-flow" />
+      <path d="M-20 60 C 220 110, 380 20, 560 70 S 860 10, 1020 40" fill="none" stroke="rgb(255 255 255 / 0.06)" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" className="route-flow" />
       {[[470, 160], [760, 300], [180, 300]].map(([x, y]) => (
         <circle key={x} cx={x} cy={y} r="5" fill="rgb(242 194 48 / 0.35)" />
       ))}
     </svg>
   );
+}
+
+function CountUp({ to }: { to: number }) {
+  return <>{useCountUp(to)}</>;
 }

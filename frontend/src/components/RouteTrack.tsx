@@ -32,9 +32,16 @@ export default function RouteTrack({ status, compact = false }: { status: Reques
           <li key={n.key} className={`relative flex flex-col ${last ? "" : "flex-1"}`}
             aria-current={n.state === "current" ? "step" : undefined}>
             <div className="flex w-full items-center">
-              <Dot state={n.state} />
+              <span className={`flex ${n.state === "todo" ? "" : "route-pop"}`} style={{ animationDelay: `${i * 220}ms` }}>
+                <Dot state={n.state} />
+              </span>
               {!last && (
-                <span className={`mx-1 h-[2px] flex-1 rounded-full ${lineDone ? "bg-brand-600" : "bg-[repeating-linear-gradient(90deg,var(--color-line)_0_6px,transparent_6px_10px)]"}`} />
+                <span className="relative mx-1 h-[2px] flex-1 rounded-full bg-[repeating-linear-gradient(90deg,var(--color-line)_0_6px,transparent_6px_10px)]">
+                  {lineDone && (
+                    <span className={`route-fill absolute inset-0 rounded-full ${nodes[i + 1].state === "stopped" || nodes[i + 1].state === "off" ? "bg-brand-600" : "bg-brand-600"}`}
+                      style={{ animationDelay: `${i * 220 + 110}ms` }} />
+                  )}
+                </span>
               )}
             </div>
             {!compact && (
