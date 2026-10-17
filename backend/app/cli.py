@@ -20,7 +20,7 @@ def _print(run, plan) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="python -m app.cli", description="Загрузка сотрудников в JanaMen")
+    p = argparse.ArgumentParser(prog="python -m app.cli", description="Загрузка сотрудников в Jana Hub")
     sub = p.add_subparsers(dest="cmd", required=True)
     f = sub.add_parser("import-employees", help="загрузить сотрудников из .xlsx или .csv")
     f.add_argument("file")

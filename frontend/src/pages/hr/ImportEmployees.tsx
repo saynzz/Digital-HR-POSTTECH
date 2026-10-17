@@ -85,7 +85,7 @@ export default function ImportEmployees() {
               <input type="checkbox" className="accent-[var(--color-forest)]" checked={fullSync} onChange={(e) => setFullSync(e.target.checked)} />
               Полная сверка: показать тех, кого нет в файле
             </label>
-            <button onClick={() => api.download("/hr/import/template.csv", "janamen-employees-template.csv")}
+            <button onClick={() => api.download("/hr/import/template.csv", "janahub-employees-template.csv")}
               className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-forest hover:underline"><Download size={15} /> Шаблон</button>
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function ImportEmployees() {
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-signal text-forest"><Database size={24} /></span>
             <div>
               <p className="font-display text-[18px] font-bold">Синхронизация с 1С:ЗУП</p>
-              <p className="mt-1 text-[13px] text-white/65">JanaMen читает сотрудников напрямую из 1С через HTTP-сервис или OData: новые сотрудники, переводы, руководители, остатки отпусков и увольнения.</p>
+              <p className="mt-1 text-[13px] text-white/65">Jana Hub читает сотрудников напрямую из 1С через HTTP-сервис или OData: новые сотрудники, переводы, руководители, остатки отпусков и увольнения.</p>
             </div>
           </div>
           <div className="mt-5 flex-1 rounded-[22px] bg-white/[0.07] p-4 text-[13px]">

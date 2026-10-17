@@ -186,12 +186,12 @@ def seed() -> None:
                 "между Китаем и странами Центральной Азии.")),
             Lesson(order=2, title="Наши ценности", content="**Открытость. Надёжность. Результат.**"),
             Lesson(order=3, title="Куда обращаться", content=(
-                "Кадровые вопросы — через JanaMen: заявки, AI Jana и центр уведомлений.")),
+                "Кадровые вопросы — через Jana Hub: заявки, AI Jana и центр уведомлений.")),
         ]
         c1.questions = [
             QuizQuestion(question="Какая из ценностей Jana Post?", options=["Скорость", "Надёжность", "Экономия"],
                          correct_index=1),
-            QuizQuestion(question="Где оформить заявку на отпуск?", options=["По почте", "В JanaMen", "Устно"],
+            QuizQuestion(question="Где оформить заявку на отпуск?", options=["По почте", "В Jana Hub", "Устно"],
                          correct_index=1),
         ]
         c2 = Course(title="Охрана труда на складе", duration_min=20, pass_score=70,

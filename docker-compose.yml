@@ -58,7 +58,7 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       MAIL_FROM: ${MAIL_FROM:-}
-      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-JanaMen · Jana Post}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Jana Hub · Jana Post}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
       EXPOSE_INVITE_LINKS: ${EXPOSE_INVITE_LINKS:-true}
       SEED_PASSWORD: ${SEED_PASSWORD:-demo123}

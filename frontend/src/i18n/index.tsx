@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 const ru = {
-  "app.name": "JanaMen",
+  "app.name": "Jana Hub",
   "nav.home": "Главная",
   "nav.requests": "Мои заявки",
   "nav.team": "Команда",

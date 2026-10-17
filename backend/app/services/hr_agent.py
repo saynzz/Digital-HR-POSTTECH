@@ -21,7 +21,7 @@ from app.services.llm import get_llm
 log = logging.getLogger(__name__)
 
 SRC_ZUP = SourceOut(doc_id="zup", title="1С:ЗУП", section="кадровые данные и остатки отпусков")
-SRC_REQ = SourceOut(doc_id="requests", title="Заявки JanaMen", section="отпуска и авансы с историей решений")
+SRC_REQ = SourceOut(doc_id="requests", title="Заявки Jana Hub", section="отпуска и авансы с историей решений")
 SRC_ACADEMY = SourceOut(doc_id="academy", title="Jana Academy", section="назначенные курсы и результаты")
 SRC_HR = SourceOut(doc_id="hr", title="HR-панель", section="кандидаты и учётные записи")
 SRC_AUDIT = SourceOut(doc_id="audit", title="Журнал доступа", section="кто и когда смотрел данные сотрудников")
@@ -310,7 +310,7 @@ def cmd_team(ctx: Ctx) -> Result | AskOut:
                                        ("Без отпуска", "right"), ("Авансы, 12 мес.", "right"), ("Курсы", "right"), "Главный сигнал"], rows))
     blocks.append(signals_block("Требует внимания", sigs, 6))
     blocks.append({"type": "export", "label": "Скачать отчёт (CSV для Excel)", "url": "/analytics/team.csv",
-                   "filename": "janamen-team-report.csv"})
+                   "filename": "janahub-team-report.csv"})
     answer = (f"{'В компании' if ctx.is_hr else 'В команде'} {len(fs)} {plural(len(fs), ('сотрудник', 'сотрудника', 'сотрудников'))}, "
               "средний стаж " + f"{avg_tenure:.1f}".replace(".", ",") + " г. " +
               (f"Сейчас в отпуске: {', '.join(f.name for f in now_off)}. " if now_off else "") +

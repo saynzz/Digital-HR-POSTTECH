@@ -104,7 +104,7 @@ function Back() {
         </div>
       </div>
       <div className="relative flex items-center justify-between border-t border-dashed border-forest/25 px-6 py-3 text-[12px] font-medium">
-        <span>JanaMen</span>
+        <span>Jana Hub</span>
         <span className="opacity-70">HR-платформа</span>
       </div>
     </div>

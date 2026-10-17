@@ -53,7 +53,7 @@ export default function Activate() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-white p-4">
       <div className="w-full max-w-md">
         <p className="mb-6 text-center text-3xl font-extrabold tracking-tight">
-          <span className="text-brand-600">JANA</span>MEN
+          <span className="text-brand-600">JANA</span>HUB
         </p>
 
         {linkError && (
@@ -74,8 +74,8 @@ export default function Activate() {
               </p>
               <p className="mt-1 text-sm text-gray-600">
                 {info.is_reset
-                  ? `${info.full_name}, задайте новый пароль для входа в JanaMen.`
-                  : `Вы — ${info.position}, ${info.company}. Придумайте пароль, чтобы войти в JanaMen.`}
+                  ? `${info.full_name}, задайте новый пароль для входа в Jana Hub.`
+                  : `Вы — ${info.position}, ${info.company}. Придумайте пароль, чтобы войти в Jana Hub.`}
               </p>
             </div>
             <Field label="Логин">

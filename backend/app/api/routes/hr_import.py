@@ -30,7 +30,7 @@ def _run_out(db: Session, run: ImportRun) -> dict:
 @router.get("/template.csv")
 def template(_: User = Depends(hr_only)):
     return Response(ds.template_csv(), media_type="text/csv; charset=utf-8",
-                    headers={"Content-Disposition": 'attachment; filename="janamen-employees-template.csv"'})
+                    headers={"Content-Disposition": 'attachment; filename="janahub-employees-template.csv"'})
 
 
 @router.post("/preview")

@@ -297,7 +297,7 @@ def _signals(f: Facts) -> list[Signal]:
             add("info", "onboarding", f"Новичок: {days_word(f.tenure_days)} в компании",
                 "Запланируйте встречу по итогам испытательного срока")
     if f.user and f.user.status == AccountStatus.invited:
-        add("medium", "not_activated", f"{f.g('Не активировал', 'Не активировала')} учётную запись JanaMen",
+        add("medium", "not_activated", f"{f.g('Не активировал', 'Не активировала')} учётную запись Jana Hub",
             "Отправьте ссылку-приглашение повторно", link="/hr", cmd=None)
     out.sort(key=lambda s: LEVEL_ORDER[s.level])
     return out

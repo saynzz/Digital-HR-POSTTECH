@@ -4,12 +4,12 @@ from html import escape
 def invite_email(full_name: str, position: str, url: str, first: bool, ttl_hours: int) -> tuple[str, str, str]:
     first_name = full_name.split(" ")[1] if len(full_name.split(" ")) > 1 else full_name
     if first:
-        subject = "Доступ к JanaMen — HR-платформе Jana Post"
-        lead = f"Для вас создан доступ к JanaMen — единой HR-платформе Jana Post ({position})."
+        subject = "Доступ к Jana Hub — HR-платформе Jana Post"
+        lead = f"Для вас создан доступ к Jana Hub — единой HR-платформе Jana Post ({position})."
         action = "Создать пароль"
     else:
-        subject = "Восстановление доступа к JanaMen"
-        lead = "Мы получили запрос на смену пароля в JanaMen."
+        subject = "Восстановление доступа к Jana Hub"
+        lead = "Мы получили запрос на смену пароля в Jana Hub."
         action = "Задать новый пароль"
 
     text = (
@@ -26,7 +26,7 @@ def invite_email(full_name: str, position: str, url: str, first: bool, ttl_hours
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;border:1px solid #e3e8e1">
 <tr><td style="padding:28px 32px 8px">
-<span style="font-size:22px;font-weight:800;letter-spacing:-0.5px"><span style="color:#2f8a22">JANA</span>MEN</span>
+<span style="font-size:22px;font-weight:800;letter-spacing:-0.5px"><span style="color:#2f8a22">JANA</span>HUB</span>
 </td></tr>
 <tr><td style="padding:8px 32px 0">
 <h1 style="margin:0 0 12px;font-size:20px">Здравствуйте, {e(first_name)}!</h1>
@@ -41,7 +41,7 @@ def invite_email(full_name: str, position: str, url: str, first: bool, ttl_hours
 Если вы не ожидали это письмо, просто проигнорируйте его.</p>
 </td></tr>
 </table>
-<p style="margin:16px 0 0;font-size:12px;color:#8a948c">Jana Post · HR-платформа JanaMen</p>
+<p style="margin:16px 0 0;font-size:12px;color:#8a948c">Jana Post · HR-платформа Jana Hub</p>
 </td></tr></table>
 </body></html>"""
     return subject, text, html

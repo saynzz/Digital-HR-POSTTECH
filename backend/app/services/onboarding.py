@@ -151,7 +151,7 @@ def hire(db: Session, hr: User, c: Candidate, start_date: date, role: Role) -> t
         db.add(Enrollment(employee_id=employee.id, course_id=welcome.id, assigned_by_user_id=hr.id,
                           due_date=start_date + timedelta(days=7)))
         notify(db, user.id, "course_assigned", f"Назначен курс: {welcome.title}", None, f"/academy/{welcome.id}")
-    notify(db, user.id, "system", "Добро пожаловать в JanaMen!", "Здесь ваш профиль, заявки, обучение и AI Jana", "/")
+    notify(db, user.id, "system", "Добро пожаловать в Jana Hub!", "Здесь ваш профиль, заявки, обучение и AI Jana", "/")
     if manager and manager.user:
         notify(db, manager.user.id, "system", f"В команду добавлен сотрудник: {c.full_name}",
                f"{c.position}, выход {start_date.strftime('%d.%m.%Y')}", "/team")
