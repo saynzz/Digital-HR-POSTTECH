@@ -41,7 +41,7 @@ def fake_smtp(monkeypatch):
 
 def adapter(**kw):
     return SMTPMailAdapter(host="smtp.gmail.com", port=587, user="team@gmail.com",
-                           password="abcd efgh ijkl mnop", sender="", sender_name="Jana Hub", **kw)
+                           password="abcd efgh ijkl mnop", sender="", sender_name="JanaMen", **kw)
 
 
 def test_gmail_starttls_login_and_html():

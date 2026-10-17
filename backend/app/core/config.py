@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    app_name: str = "Jana Hub API"
+    app_name: str = "JanaMen API"
     database_url: str = "sqlite:///./janamen.db"
     jwt_secret: str = "dev-secret-change-me"
     jwt_algorithm: str = "HS256"
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     mail_from: str = ""
-    mail_from_name: str = "Jana Hub · Jana Post"
+    mail_from_name: str = "JanaMen · Jana Post"
 
     app_base_url: str = "http://localhost:5173"
     invite_ttl_hours: int = 72

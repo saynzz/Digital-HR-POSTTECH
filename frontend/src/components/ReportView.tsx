@@ -53,7 +53,7 @@ function Person({ b }: { b: Of<"person"> }) {
         <span className="rounded-full bg-white/10 px-3 py-1">Стаж <b className="text-signal">{b.tenure}</b></span>
         <span className="rounded-full bg-white/10 px-3 py-1">В компании с {fmtD(b.hire_date)}</span>
         {b.manager && <span className="rounded-full bg-white/10 px-3 py-1">Руководитель: {b.manager}</span>}
-        <span className="rounded-full bg-white/10 px-3 py-1">Доступ в Jana Hub: {b.account}</span>
+        <span className="rounded-full bg-white/10 px-3 py-1">Доступ в JanaMen: {b.account}</span>
       </div>
     </div>
   );

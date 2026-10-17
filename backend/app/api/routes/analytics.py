@@ -32,4 +32,4 @@ def team_csv(user: User = Depends(require_roles(Role.manager, Role.hr)), db: Ses
     db.add(AuditLog(user_id=user.id, action="export:team_csv", details=f"{len(facts)} сотрудников"))
     db.commit()
     return Response("﻿" + buf.getvalue(), media_type="text/csv; charset=utf-8",
-                    headers={"Content-Disposition": 'attachment; filename="janahub-team-report.csv"'})
+                    headers={"Content-Disposition": 'attachment; filename="janamen-team-report.csv"'})

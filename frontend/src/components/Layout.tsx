@@ -122,7 +122,7 @@ function Logo() {
         </svg>
       </span>
       <span className="font-display text-[19px] font-bold tracking-[-0.03em] text-white">
-        <span className="text-signal">JANA</span>HUB
+        <span className="text-signal">JANA</span>MEN
       </span>
     </div>
   );

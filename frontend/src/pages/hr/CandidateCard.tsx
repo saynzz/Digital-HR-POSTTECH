@@ -174,7 +174,7 @@ export default function CandidateCard({ candidate, onClose, onChanged, onEdit }:
       {step === "hire" && (
         <div className="space-y-4">
           <p className="text-sm text-muted">
-            Будет создана запись сотрудника в 1С:ЗУП и учётная запись в Jana Hub. На <b>{c.email}</b> уйдёт
+            Будет создана запись сотрудника в 1С:ЗУП и учётная запись в JanaMen. На <b>{c.email}</b> уйдёт
             одноразовая ссылка, по которой сотрудник сам придумает пароль.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">

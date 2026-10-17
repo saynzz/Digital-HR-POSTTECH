@@ -1,4 +1,4 @@
-# Архитектура Jana Hub
+# Архитектура JanaMen
 
 ```mermaid
 flowchart LR
@@ -71,7 +71,7 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
   actor HR
-  participant P as Jana Hub
+  participant P as JanaMen
   participant Z as 1С:ЗУП
   participant M as Почта
   actor E as Сотрудник

@@ -40,7 +40,7 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="text-4xl font-extrabold tracking-tight">
-            <span className="text-brand-600">JANA</span>HUB
+            <span className="text-brand-600">JANA</span>MEN
           </p>
           <p className="mt-2 text-sm text-gray-500">Единая HR-платформа Jana Post</p>
         </div>
