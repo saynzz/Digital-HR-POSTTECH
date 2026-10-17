@@ -3,7 +3,8 @@ import { useCountUp } from "../components/useCountUp";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Banknote, Bot, Palmtree } from "lucide-react";
 import { api } from "../api/client";
-import type { Enrollment, HRRequest, Notification } from "../api/types";
+import type { Enrollment, HRRequest, MotivationSummary, Notification } from "../api/types";
+import { Coin, GoalCard } from "../components/Motivation";
 import { useAuth } from "../auth/AuthContext";
 import EmployeePass from "../components/EmployeePass";
 import RequestRow from "../components/RequestRow";
@@ -18,11 +19,13 @@ export default function Dashboard() {
   const [requests, setRequests] = useState<HRRequest[] | null>(null);
   const [courses, setCourses] = useState<Enrollment[]>([]);
   const [notes, setNotes] = useState<Notification[]>([]);
+  const [mot, setMot] = useState<MotivationSummary | null>(null);
 
   useEffect(() => {
     api.requests("my").then(setRequests);
     api.myCourses().then(setCourses);
     api.notifications().then(setNotes);
+    api.motivation().then(setMot).catch(() => setMot(null));
   }, []);
 
   if (!user) return null;
@@ -107,6 +110,20 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+
+      {mot && (
+        <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <GoalCard goal={mot.goal} compact />
+          <Link to="/rewards" className="group flex flex-col justify-between rounded-[28px] bg-signal p-6 text-forest transition hover:brightness-105">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.1em]">Jana-коины</span>
+            <span className="mt-2 flex items-center gap-2 font-display text-[44px] font-bold leading-none tracking-[-0.04em]"><Coin size={38} /> {mot.coins}</span>
+            <span className="mt-3 flex items-center justify-between text-[13px] font-semibold">
+              Магазин наград и благодарности
+              <ArrowUpRight size={18} className="transition group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+        </div>
+      )}
 
       <section>
         <div className="mb-4 mt-4 flex items-end justify-between">

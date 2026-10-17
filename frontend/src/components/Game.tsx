@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  CalendarCheck, Check, ChevronRight, Clock, Crown, Flag, Flame, Footprints, Library, Lock, Medal, Package, Route,
+  CalendarCheck, Check, ChevronRight, Handshake, Heart, Palmtree, Snowflake, Clock, Crown, Flag, Flame, Footprints, Library, Lock, Medal, Package, Route,
   Sparkles, Sprout, Target, Trophy, Truck, X, Zap,
 } from "lucide-react";
 import type { GameProfile, LeaderRow, Rewards, Track } from "../api/types";
@@ -11,13 +11,20 @@ import { fmtDate, pluralRu } from "./ui";
 
 const BADGE_ICONS = {
   footprints: Footprints, package: Package, target: Target, zap: Zap, clock: Clock, flame: Flame,
-  calendar: CalendarCheck, route: Route, books: Library, trophy: Trophy,
+  calendar: CalendarCheck, route: Route, books: Library, trophy: Trophy, heart: Heart, handshake: Handshake,
 } as const;
 const TRACK_ICONS = { sprout: Sprout, truck: Truck, crown: Crown, route: Route } as const;
 
 export const badgeIcon = (key: string) => BADGE_ICONS[key as keyof typeof BADGE_ICONS] ?? Medal;
 export const trackIcon = (key: string) => TRACK_ICONS[key as keyof typeof TRACK_ICONS] ?? Route;
 const days = (n: number) => pluralRu(n, ["день", "дня", "дней"]);
+const STATE_CLS: Record<string, string> = {
+  active: "bg-signal text-forest", weekend: "bg-white/[0.04] border border-dashed border-white/15", vacation: "bg-[#2f7a4f] text-white/80",
+  frozen: "bg-[#9ad0f5] text-forest", missed: "bg-white/10", today: "bg-white/10",
+};
+const STATE_LABEL: Record<string, string> = {
+  active: "занимались", weekend: "выходной", vacation: "отпуск", frozen: "заморозка", missed: "пропуск", today: "сегодня",
+};
 
 function LevelRing({ level, progress }: { level: number; progress: number }) {
   const r = 52;
@@ -86,17 +93,28 @@ export function GameHero({ g }: { g: GameProfile }) {
           </div>
           <div className="mt-4 flex justify-between gap-1">
             {g.streak.days.map((d, i) => (
-              <span key={d.date} title={fmtDate(d.date)}
-                className={`h-6 flex-1 rounded-md ${d.active ? "bg-signal" : "bg-white/10"} ${i === g.streak.days.length - 1 ? "ring-2 ring-white/60 ring-offset-2 ring-offset-forest" : ""}`} />
+              <span key={d.date} title={`${fmtDate(d.date)}: ${STATE_LABEL[d.state]}`}
+                className={`flex h-6 flex-1 items-center justify-center rounded-md ${STATE_CLS[d.state]} ${i === g.streak.days.length - 1 ? "ring-2 ring-white/60 ring-offset-2 ring-offset-forest" : ""}`}>
+                {d.state === "frozen" && <Snowflake size={11} />}
+                {d.state === "vacation" && <Palmtree size={11} />}
+              </span>
             ))}
           </div>
           <p className="mt-3 text-[12px] leading-snug text-white/70">
-            {g.streak.today ? "Сегодня вы уже занимались — серия продолжается." : g.streak.current
-              ? "Пройдите урок сегодня, чтобы не прервать серию и получить бонус."
+            {g.streak.today ? "Сегодня вы уже занимались — серия продолжается."
+              : g.streak.rest_today ? "Сегодня выходной — серия не сгорит. Отдыхайте!"
+              : g.streak.current ? "Пройдите урок сегодня, чтобы продлить серию и получить бонус."
               : "Пройдите урок сегодня и начните серию."}
+          </p>
+          <p className="mt-2 flex items-center gap-1.5 text-[11.5px] text-white/55">
+            <Snowflake size={12} className="text-[#9ad0f5]" />
+            {g.streak.freeze_available ? "Заморозка на этой неделе доступна: один пропуск не сбросит серию" : "Заморозка этой недели уже использована"}
           </p>
           <p className="mt-3 flex items-center gap-2 border-t border-white/10 pt-3 text-[12px] text-white/70">
             <Medal size={15} className="text-signal" /> Бейджей: <b className="text-white">{earned} из {g.badges.length}</b>
+            <Link to="/rewards" className="ml-auto inline-flex items-center gap-1 rounded-full bg-signal px-2.5 py-1 font-semibold text-forest hover:brightness-105">
+              {g.coins} коинов <ChevronRight size={13} />
+            </Link>
           </p>
         </div>
       </div>

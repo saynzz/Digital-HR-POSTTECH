@@ -1,6 +1,7 @@
 import type {
-  Account, AgentCommands, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, GameProfile, HireResult, LeaderRow, Track,
-  HRRequest, HRRequestDetail, InviteInfo, InviteResult, Me, Notification, RequestType,
+  Account, AgentCommands, AskResponse, Candidate, CandidateInput, CandidateStatus, Course, CourseDetail, Employee, Enrollment, GameProfile, HireResult, KudosItem, KudosValue, LeaderRow, MotivationSummary, Person,
+  RedemptionItem, Rewards, RewardItem, TeamGoal, Track,
+  HRRequest, HRRequestDetail, ImportRun, InviteInfo, ZupStatus, InviteResult, Me, Notification, RequestType,
 } from "./types";
 
 const TOKEN_KEY = "janamen_token";
@@ -93,6 +94,43 @@ export const api = {
   joinTrack: (id: number) => post<Track>(`/academy/tracks/${id}/join`),
   assignTrack: (employee_id: number, track_id: number, due_date?: string) =>
     post<Track>("/academy/tracks/assign", { employee_id, track_id, due_date }),
+  motivation: () => request<MotivationSummary>("/motivation/summary"),
+  rewards: () => request<RewardItem[]>("/motivation/rewards"),
+  redeem: (id: number) => post<RedemptionItem>(`/motivation/rewards/${id}/redeem`),
+  myRedemptions: () => request<RedemptionItem[]>("/motivation/redemptions/my"),
+  cancelRedemption: (id: number) => post<RedemptionItem>(`/motivation/redemptions/${id}/cancel`),
+  colleagues: () => request<Person[]>("/motivation/colleagues"),
+  sendKudos: (to_employee_id: number, value: KudosValue, message: string) =>
+    post<{ kudos: KudosItem; rewards: Rewards | null; kudos_left: number }>("/motivation/kudos", { to_employee_id, value, message }),
+  kudos: (scope: "all" | "me" | "team") => request<KudosItem[]>(`/motivation/kudos?scope=${scope}`),
+  goals: () => request<{ department: string; goal: TeamGoal | null }[]>("/motivation/goals"),
+  setGoal: (data: { department?: string; title: string; reward: string; target_xp: number; end_date: string }) =>
+    post<TeamGoal>("/motivation/goals", data),
+  importPreview: async (file: File, fullSync: boolean) => {
+    const token = tokenStore.get();
+    const form = new FormData();
+    form.append("file", file);
+    form.append("full_sync", String(fullSync));
+    const res = await fetch("/api/hr/import/preview", { method: "POST", body: form, headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, errorMessage(body.detail));
+    }
+    return res.json() as Promise<ImportRun>;
+  },
+  zupStatus: () => request<ZupStatus>("/hr/import/zup/status"),
+  zupPreview: (full_sync: boolean) => post<ImportRun>("/hr/import/zup/preview", { full_sync }),
+  importRuns: () => request<ImportRun[]>("/hr/import/runs"),
+  importRun: (id: number) => request<ImportRun>(`/hr/import/runs/${id}`),
+  applyImport: (id: number, opts: { send_invites: boolean; block_missing: boolean; assign_onboarding: boolean }) =>
+    post<ImportRun>(`/hr/import/runs/${id}/apply`, opts),
+  adminRedemptions: () => request<RedemptionItem[]>("/motivation/admin/redemptions"),
+  decideRedemption: (id: number, approve: boolean, comment?: string) =>
+    post<RedemptionItem>(`/motivation/admin/redemptions/${id}/decide`, { approve, comment: comment || null }),
+  adminRewards: () => request<RewardItem[]>("/motivation/admin/rewards"),
+  createReward: (data: Omit<RewardItem, "id">) => post<RewardItem>("/motivation/admin/rewards", data),
+  updateReward: (id: number, data: Omit<RewardItem, "id">) =>
+    request<RewardItem>(`/motivation/admin/rewards/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   leaderboard: (scope: "team" | "company", period: "week" | "all") =>
     request<{ rows: LeaderRow[] }>(`/academy/leaderboard?scope=${scope}&period=${period}`),
 

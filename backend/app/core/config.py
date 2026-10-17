@@ -13,7 +13,15 @@ class Settings(BaseSettings):
     seed_on_startup: bool = True
     reset_db_on_schema_change: bool = True
 
+    company_name: str = "ТОО «Jana Post»"
+
     hr_system_provider: str = "mock"
+    zup_url: str = ""
+    zup_user: str = ""
+    zup_password: str = ""
+    zup_field_map: str = ""
+    zup_timeout: float = 30.0
+    zup_verify_tls: bool = True
     docflow_provider: str = "mock"
     mail_provider: str = "auto"
     smtp_host: str = "smtp.gmail.com"

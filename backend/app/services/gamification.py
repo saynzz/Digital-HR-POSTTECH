@@ -5,7 +5,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import (
-    EarnedBadge, Employee, Enrollment, EnrollmentStatus, Lesson, Track, TrackEnrollment, User, XpEvent,
+    CoinTx, EarnedBadge, Employee, Enrollment, EnrollmentStatus, HRRequest, Kudos, Lesson, RequestStatus, RequestType,
+    TeamGoal, Track, TrackEnrollment, User, XpEvent,
 )
 from app.services.notifications import notify
 
@@ -38,6 +39,8 @@ BADGES = [
     ("track", "Маршрут пройден", "Завершить траекторию обучения", "route"),
     ("courses5", "Книжный червь", "Пройти 5 курсов", "books"),
     ("level4", "Логист", "Достичь 4-го уровня", "trophy"),
+    ("thanks", "Спасибо!", "Отправить первую благодарность коллеге", "heart"),
+    ("team_soul", "Душа команды", "Получить 5 благодарностей от коллег", "handshake"),
 ]
 BADGE_INFO = {code: (title, desc, icon) for code, title, desc, icon in BADGES}
 
@@ -73,22 +76,62 @@ def active_days(db: Session, employee_id: int) -> set[date]:
     return {to_local(d) for d in rows}
 
 
-def streak_info(days: set[date], today: date | None = None) -> dict:
-    today = today or today_local()
-    anchor = today if today in days else today - timedelta(days=1)
-    cur = 0
-    d = anchor
-    while d in days:
-        cur += 1
+def off_days(db: Session, employee_id: int) -> set[date]:
+    out: set[date] = set()
+    reqs = db.scalars(select(HRRequest).where(HRRequest.employee_id == employee_id,
+                                              HRRequest.type == RequestType.vacation,
+                                              HRRequest.status == RequestStatus.approved))
+    for r in reqs:
+        d, end = date.fromisoformat(r.payload["start_date"]), date.fromisoformat(r.payload["end_date"])
+        while d <= end:
+            out.add(d)
+            d += timedelta(days=1)
+    return out
+
+
+def _is_rest(d: date, off: set[date]) -> bool:
+    return d.weekday() >= 5 or d in off
+
+
+def _chain(days: set[date], end: date, off: set[date], floor: date) -> tuple[int, set[date]]:
+    count, frozen, pending, used = 0, set(), [], set()
+    d = end
+    while d >= floor:
+        if d in days:
+            count += 1
+            frozen.update(pending)
+            pending.clear()
+        elif not _is_rest(d, off):
+            week = d.isocalendar()[:2]
+            if week in used:
+                break
+            used.add(week)
+            pending.append(d)
         d -= timedelta(days=1)
-    best, run, prev = 0, 0, None
-    for d in sorted(days):
-        run = run + 1 if prev and (d - prev).days == 1 else 1
-        best = max(best, run)
-        prev = d
-    return {"current": cur, "best": max(best, cur), "today": today in days,
-            "days": [{"date": (today - timedelta(days=i)).isoformat(), "active": (today - timedelta(days=i)) in days}
-                     for i in range(13, -1, -1)]}
+    return count, frozen
+
+
+def streak_info(days: set[date], today: date | None = None, off: set[date] | None = None) -> dict:
+    today = today or today_local()
+    off = off or set()
+    if not days:
+        floor = today
+    else:
+        floor = min(days)
+    start = today if today in days else today - timedelta(days=1)
+    cur, frozen = _chain(days, start, off, floor) if days else (0, set())
+    best = cur
+    for d in days:
+        best = max(best, _chain(days, d, off, floor)[0])
+    strip = []
+    for i in range(13, -1, -1):
+        d = today - timedelta(days=i)
+        state = ("active" if d in days else "vacation" if d in off else "weekend" if d.weekday() >= 5
+                 else "frozen" if d in frozen else "today" if d == today else "missed")
+        strip.append({"date": d.isoformat(), "active": d in days, "state": state})
+    week = today.isocalendar()[:2]
+    return {"current": cur, "best": best, "today": today in days, "rest_today": _is_rest(today, off),
+            "freeze_available": not any(f.isocalendar()[:2] == week for f in frozen), "days": strip}
 
 
 @dataclass
@@ -113,7 +156,9 @@ def _give(db: Session, r: Rewards, employee_id: int, kind: str, ref: str, xp: in
           at: datetime | None = None) -> None:
     if _has(db, employee_id, ref):
         return
-    db.add(XpEvent(employee_id=employee_id, kind=kind, ref=ref, xp=xp, title=title, **({"created_at": at} if at else {})))
+    extra = {"created_at": at} if at else {}
+    db.add(XpEvent(employee_id=employee_id, kind=kind, ref=ref, xp=xp, title=title, **extra))
+    db.add(CoinTx(employee_id=employee_id, amount=xp, reason=title, ref=f"xp:{ref}", **extra))
     db.flush()
     r.xp += xp
     r.items.append({"label": title, "xp": xp})
@@ -122,7 +167,7 @@ def _give(db: Session, r: Rewards, employee_id: int, kind: str, ref: str, xp: in
 def _streak_bonus(db: Session, r: Rewards, employee_id: int) -> None:
     today = today_local()
     days = active_days(db, employee_id)
-    st = streak_info(days, today)
+    st = streak_info(days, today, off_days(db, employee_id))
     if st["current"] >= 2 and not _has(db, employee_id, f"streak:{today.isoformat()}"):
         bonus = XP_STREAK * min(st["current"], 7)
         _give(db, r, employee_id, "streak", f"streak:{today.isoformat()}", bonus,
@@ -139,8 +184,10 @@ def evaluate_badges(db: Session, employee_id: int, at: datetime | None = None) -
     enrolls = list(db.scalars(select(Enrollment).where(Enrollment.employee_id == employee_id)))
     done = [e for e in enrolls if e.status == EnrollmentStatus.completed]
     days = active_days(db, employee_id)
-    st = streak_info(days)
+    st = streak_info(days, None, off_days(db, employee_id))
     xp = total_xp(db, employee_id)
+    sent = db.scalar(select(func.count(Kudos.id)).where(Kudos.from_employee_id == employee_id))
+    got = db.scalar(select(func.count(Kudos.id)).where(Kudos.to_employee_id == employee_id))
     track_done = db.scalar(select(TrackEnrollment.id).where(
         TrackEnrollment.employee_id == employee_id, TrackEnrollment.completed_at.is_not(None))) is not None
     rules = {
@@ -154,6 +201,8 @@ def evaluate_badges(db: Session, employee_id: int, at: datetime | None = None) -
         "track": track_done,
         "courses5": len(done) >= 5,
         "level4": xp >= LEVELS[3][0],
+        "thanks": sent >= 1,
+        "team_soul": got >= 5,
     }
     new = []
     for code, ok in rules.items():
@@ -165,10 +214,44 @@ def evaluate_badges(db: Session, employee_id: int, at: datetime | None = None) -
     return new
 
 
+def coins(db: Session, employee_id: int) -> int:
+    return int(db.scalar(select(func.coalesce(func.sum(CoinTx.amount), 0)).where(CoinTx.employee_id == employee_id)))
+
+
+def goal_progress(db: Session, goal: TeamGoal) -> dict:
+    ids = list(db.scalars(select(Employee.id).where(Employee.department == goal.department)))
+    since = datetime.combine(goal.start_date, datetime.min.time(), tzinfo=LOCAL_TZ)
+    rows = dict(db.execute(select(XpEvent.employee_id, func.sum(XpEvent.xp)).where(
+        XpEvent.employee_id.in_(ids), XpEvent.created_at >= since).group_by(XpEvent.employee_id)).all()) if ids else {}
+    total = int(sum(rows.values()))
+    return {"total": total, "percent": min(100, round(100 * total / goal.target_xp)) if goal.target_xp else 0,
+            "by_employee": {k: int(v) for k, v in rows.items()}, "members": len(ids)}
+
+
+def active_goal(db: Session, department: str) -> TeamGoal | None:
+    today = today_local()
+    return db.scalar(select(TeamGoal).where(TeamGoal.department == department, TeamGoal.end_date >= today,
+                                            TeamGoal.start_date <= today).order_by(TeamGoal.created_at.desc()))
+
+
+def check_goal(db: Session, employee_id: int) -> None:
+    emp = db.get(Employee, employee_id)
+    goal = active_goal(db, emp.department) if emp else None
+    if goal is None or goal.achieved_at is not None:
+        return
+    if goal_progress(db, goal)["total"] >= goal.target_xp:
+        goal.achieved_at = datetime.now(timezone.utc)
+        users = db.scalars(select(User).join(Employee, User.employee_id == Employee.id)
+                           .where(Employee.department == goal.department))
+        for u in users:
+            notify(db, u.id, "system", f"Цель отдела достигнута: {goal.title}", f"Награда: {goal.reward}", "/rewards")
+
+
 def _finish(db: Session, r: Rewards, employee_id: int, xp_before: int) -> Rewards:
     for t in check_tracks(db, employee_id, r):
         r.tracks.append(t)
     r.badges = evaluate_badges(db, employee_id)
+    check_goal(db, employee_id)
     before, after = level_info(xp_before), level_info(xp_before + r.xp)
     if after["level"] > before["level"]:
         r.level_up = {"level": after["level"], "title": after["title"]}
@@ -284,7 +367,7 @@ def leaderboard(db: Session, employees: list[Employee], since: datetime | None, 
         lvl = level_info(int(totals.get(e.id) or 0))
         rows.append({"employee_id": e.id, "name": " ".join(e.full_name.split()[:2]), "department": e.department,
                      "position": e.position, "xp": xp, "level": lvl["level"], "level_title": lvl["title"],
-                     "streak": streak_info(active_days(db, e.id))["current"], "me": e.id == me})
+                     "streak": streak_info(active_days(db, e.id), None, off_days(db, e.id))["current"], "me": e.id == me})
     rows.sort(key=lambda x: (-x["xp"], x["name"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i

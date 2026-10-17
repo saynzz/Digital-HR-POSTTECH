@@ -3,7 +3,10 @@ from datetime import date, datetime, time, timedelta, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Course, Enrollment, EnrollmentStatus, Lesson, QuizQuestion, Track, TrackCourse, TrackEnrollment, User, XpEvent
+from app.models import (
+    CoinTx, Course, Enrollment, EnrollmentStatus, Kudos, Lesson, QuizQuestion, Redemption, RedemptionStatus, Reward,
+    TeamGoal, Track, TrackCourse, TrackEnrollment, User, XpEvent,
+)
 from app.services import gamification as game
 
 TZ = timezone(timedelta(hours=5))
@@ -229,4 +232,71 @@ def seed_academy(db: Session, today: date, u: dict, e: dict, c1: Course, c2: Cou
     db.flush()
     for emp in e.values():
         game.evaluate_badges(db, emp.id)
+    db.flush()
+
+
+REWARDS = [
+    ("Кружка Jana Post", "Фирменная кружка с жёлтым фургоном.", 120, "coffee", 30),
+    ("Парковочное место на месяц", "Закреплённое место у офиса или склада.", 250, "car", 3),
+    ("Обед с руководителем", "Неформальный обед: обсудить идеи и планы развития.", 300, "utensils", None),
+    ("Худи Jana Post", "Тёплое худи в фирменных цветах.", 350, "shirt", 15),
+    ("Приоритет в выборе дат отпуска", "Выбираете даты летнего отпуска первым в отделе.", 400, "calendar", None),
+    ("Выходной в день рождения", "Дополнительный оплачиваемый выходной в ваш день рождения.", 600, "cake", None),
+    ("Внешний курс за счёт компании", "Профессиональный курс или конференция до 100 000 ₸.", 900, "graduation", None),
+]
+
+KUDOS = [
+    ("daniyar", "alia", "reliable", "Подменила меня на смене в последний момент — выручила всю команду!", 2),
+    ("head_log", "alia", "result", "Отличная работа с поставкой: ни одной ошибки в накладных.", 1),
+    ("alia", "nurbol", "open", "Показал короткий путь до сортировочного центра — экономим полчаса.", 9),
+    ("hr", "anastasia", "open", "Спасибо за вопросы на адаптации — по ним дополнили базу знаний.", 4),
+    ("nurbol", "daniyar", "reliable", "Помог загрузить фургон под дождём, без тебя бы не успели.", 3),
+    ("madina", "head_fin", "result", "Закрыли квартальный отчёт на день раньше срока.", 6),
+    ("head_fin", "madina", "reliable", "Всегда точные цифры — можно не перепроверять.", 12),
+    ("alia", "daniyar", "result", "Разобрал завал на складе за одну смену!", 16),
+]
+
+
+def seed_motivation(db: Session, today: date, u: dict, e: dict) -> None:
+    rewards = [Reward(title=t, description=d, cost=c, icon=i, stock=s) for t, d, c, i, s in REWARDS]
+    db.add_all(rewards)
+    first = today.replace(day=1)
+    last = (first + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    db.add_all([
+        TeamGoal(department="Логистика", title="Вместе к пицца-пятнице", reward="Пицца-пятница для всего отдела",
+                 target_xp=900, start_date=first, end_date=last, created_by_user_id=u["manager"].id),
+        TeamGoal(department="Финансы", title="Финансовая грамотность", reward="Командный ужин",
+                 target_xp=500, start_date=first, end_date=last, created_by_user_id=u["manager2"].id),
+    ])
+    db.flush()
+    for frm, to, value, msg, ago in KUDOS:
+        k = Kudos(from_employee_id=e[frm].id, to_employee_id=e[to].id, value=value, message=msg,
+                  created_at=_ts(today - timedelta(days=ago), 12))
+        db.add(k)
+        db.flush()
+        at = _ts(today - timedelta(days=ago), 12)
+        _xp(db, e[to].id, "kudos", f"kudos:{k.id}:to", 15, f"Благодарность от {' '.join(e[frm].full_name.split()[:2])}", at)
+        _xp(db, e[frm].id, "kudos_sent", f"kudos:{k.id}:from", 5, f"Благодарность коллеге: {' '.join(e[to].full_name.split()[:2])}", at)
+    hoodie = rewards[3]
+    r = Redemption(employee_id=e["nurbol"].id, reward_id=hoodie.id, cost=hoodie.cost, created_at=_ts(today - timedelta(days=1), 9))
+    db.add(r)
+    db.flush()
+    db.add(CoinTx(employee_id=e["nurbol"].id, amount=-hoodie.cost, reason=f"Обмен: {hoodie.title}", ref=f"redeem:{r.id}",
+                  created_at=r.created_at))
+    hoodie.stock -= 1
+    mug = rewards[0]
+    r2 = Redemption(employee_id=e["madina"].id, reward_id=mug.id, cost=mug.cost, status=RedemptionStatus.approved,
+                    comment="Кружка ждёт вас на ресепшене", decided_by_user_id=u["hr"].id,
+                    created_at=_ts(today - timedelta(days=10), 9), decided_at=_ts(today - timedelta(days=9), 11))
+    db.add(r2)
+    db.flush()
+    db.add(CoinTx(employee_id=e["madina"].id, amount=-mug.cost, reason=f"Обмен: {mug.title}", ref=f"redeem:{r2.id}",
+                  created_at=r2.created_at))
+    mug.stock -= 1
+    db.flush()
+    for emp in e.values():
+        game.evaluate_badges(db, emp.id)
+    for g in db.scalars(select(TeamGoal)):
+        if game.goal_progress(db, g)["total"] >= g.target_xp:
+            g.achieved_at = datetime.now(timezone.utc)
     db.flush()

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Bot, ClipboardList, GraduationCap, Home, LogOut, Menu, ShieldCheck, Users, X } from "lucide-react";
+import { Bell, Bot, Gift, ClipboardList, GraduationCap, Home, LogOut, Menu, ShieldCheck, Users, X } from "lucide-react";
 import { api } from "../api/client";
 import type { Role } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
@@ -11,6 +11,7 @@ const NAV: { to: string; key: TKey; icon: typeof Home; roles?: Role[] }[] = [
   { to: "/requests", key: "nav.requests", icon: ClipboardList },
   { to: "/team", key: "nav.team", icon: Users, roles: ["manager", "hr"] },
   { to: "/academy", key: "nav.academy", icon: GraduationCap },
+  { to: "/rewards", key: "nav.rewards", icon: Gift },
   { to: "/assistant", key: "nav.assistant", icon: Bot },
   { to: "/hr", key: "nav.hr", icon: ShieldCheck, roles: ["hr"] },
 ];

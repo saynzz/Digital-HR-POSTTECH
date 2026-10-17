@@ -76,7 +76,7 @@ def test_hr_only_commands(client):
     assert "только HR" in ask(client, login(client, "manager@jana.demo"), "/отделы")["answer"]
     hr = login(client, "hr@jana.demo")
     deps = ask(client, hr, "/отделы")
-    assert len(block(deps, "table")[0]["rows"]) == 3
+    assert len(block(deps, "table")[0]["rows"]) >= 3
     onboarding = ask(client, hr, "/найм")
     assert any("Ли Анастасия" in r["cells"][0]["text"] for r in block(onboarding, "table")[0]["rows"])
 

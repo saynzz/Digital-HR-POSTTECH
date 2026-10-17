@@ -94,7 +94,11 @@ export interface GameProfile {
   xp_week: number;
   level: { level: number; title: string; xp_from: number; xp_to: number | null; next_title: string | null; progress: number };
   levels: { level: number; xp: number; title: string }[];
-  streak: { current: number; best: number; today: boolean; days: { date: string; active: boolean }[] };
+  streak: {
+    current: number; best: number; today: boolean; rest_today: boolean; freeze_available: boolean;
+    days: { date: string; active: boolean; state: "active" | "weekend" | "vacation" | "frozen" | "missed" | "today" }[];
+  };
+  coins: number;
   badges: { code: string; title: string; description: string; icon: string; earned_at: string | null }[];
   recent: { title: string; xp: number; at: string }[];
 }
@@ -250,3 +254,108 @@ export interface InviteInfo {
   expires_at: string;
   is_reset: boolean;
 }
+
+export interface Person { id: number; name: string; position: string; department: string; initials: string }
+
+export interface TeamGoal {
+  id: number;
+  department: string;
+  title: string;
+  reward: string;
+  target_xp: number;
+  start_date: string;
+  end_date: string;
+  days_left: number;
+  achieved: boolean;
+  total: number;
+  percent: number;
+  members: number;
+  my_xp: number;
+  top: (Person & { xp: number })[];
+}
+
+export interface MotivationSummary {
+  coins: number;
+  coins_earned: number;
+  kudos_left: number;
+  kudos_per_week: number;
+  kudos_received: number;
+  values: { code: KudosValue; title: string; hint: string }[];
+  goal: TeamGoal | null;
+  history: { amount: number; reason: string; at: string }[];
+}
+
+export type KudosValue = "open" | "reliable" | "result";
+
+export interface RewardItem { id: number; title: string; description: string; cost: number; icon: string; stock: number | null; active: boolean }
+
+export interface RedemptionItem {
+  id: number;
+  reward: { id: number; title: string; icon: string };
+  cost: number;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  comment: string | null;
+  created_at: string;
+  decided_at: string | null;
+  employee: Person;
+}
+
+export interface KudosItem {
+  id: number;
+  from: Person;
+  to: Person;
+  value: KudosValue;
+  value_title: string;
+  message: string;
+  created_at: string;
+  mine: boolean;
+  sent_by_me: boolean;
+}
+
+export type ImportAction = "create" | "update" | "dismiss" | "skip" | "error";
+
+export interface ImportItem {
+  row: number;
+  external_id: string;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+  position: string;
+  department: string;
+  manager_external_id: string | null;
+  hire_date: string | null;
+  vacation_balance_days: number | null;
+  role: "employee" | "manager" | "hr";
+  dismissal_date: string | null;
+  errors: string[];
+  changes: { field: string; from: string | number; to: string | number }[];
+  action: ImportAction;
+  account: "invite" | "no_email" | "exists" | null;
+}
+
+export interface ImportSummary {
+  total: number; create: number; update: number; dismiss: number; skip: number; error: number; missing: number;
+  invites: number; no_email: number; full_sync?: boolean;
+}
+
+export interface ImportRunResult {
+  created: string[]; updated: string[]; dismissed: string[]; blocked_missing: string[];
+  invited: { name: string; email: string; email_sent: boolean }[]; mail_errors: string[];
+}
+
+export interface ImportRun {
+  id: number;
+  source: string;
+  source_label: string;
+  filename: string | null;
+  created_at: string;
+  applied: boolean;
+  applied_at: string | null;
+  created_by: string | null;
+  summary: ImportSummary;
+  items: ImportItem[];
+  missing: { external_id: string; full_name: string; department: string }[];
+  result: ImportRunResult | null;
+}
+
+export interface ZupStatus { configured: boolean; mode: "demo" | "live"; url: string | null; ok?: boolean; count?: number; error?: string }

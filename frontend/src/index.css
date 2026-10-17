@@ -175,6 +175,8 @@ body {
 @keyframes xp-toast { from { transform: translateY(30px) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
 .confetti { animation: confetti-fall linear forwards; }
 @keyframes confetti-fall { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+.kudos-fly { animation: kudos-fly 0.9s cubic-bezier(.5,0,.7,.4) forwards; }
+@keyframes kudos-fly { 0% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; } 100% { transform: translate(180px, -160px) rotate(25deg) scale(0.4); opacity: 0; } }
 .xp-float { animation: xp-float 1.2s ease-out forwards; }
 @keyframes xp-float { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-40px); opacity: 0; } }
 
@@ -191,5 +193,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .van-idle, .parcel-idle, .parcel-pop, .cloud, .city-layer, .lane, .van-shake, .parcel-bounce,
-  .rise-in, .typing-dot, .star, .bar-grow, .bar-rise, .flame, .van-hop, .badge-shine::after, .xp-toast, .confetti, .xp-float { animation: none !important; }
+  .rise-in, .typing-dot, .star, .bar-grow, .bar-rise, .flame, .van-hop, .badge-shine::after, .xp-toast, .confetti, .kudos-fly { animation: kudos-fly 0.9s cubic-bezier(.5,0,.7,.4) forwards; }
+@keyframes kudos-fly { 0% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; } 100% { transform: translate(180px, -160px) rotate(25deg) scale(0.4); opacity: 0; } }
+.xp-float { animation: none !important; }
 }

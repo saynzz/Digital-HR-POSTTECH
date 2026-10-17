@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BarChart3, GraduationCap, Search, UserSearch } from "lucide-react";
 import { api } from "../api/client";
-import type { Course, Employee, HRRequest, Track } from "../api/types";
+import type { Course, Employee, HRRequest, TeamGoal, Track } from "../api/types";
+import { GoalCard, GoalModal } from "../components/Motivation";
 import { useAuth } from "../auth/AuthContext";
 import RequestRow from "../components/RequestRow";
 import { Button, Card, Empty, ErrorText, Field, Modal, PageHeader, fmtDate, inputCls, pluralRu } from "../components/ui";
@@ -16,9 +17,12 @@ export default function Team() {
   const [query, setQuery] = useState("");
   const [assignTo, setAssignTo] = useState<Employee | null>(null);
   const navigate = useNavigate();
+  const [goal, setGoal] = useState<TeamGoal | null | undefined>(undefined);
+  const [goalOpen, setGoalOpen] = useState(false);
   const agent = (q: string) => navigate(`/assistant?q=${encodeURIComponent(q)}`);
 
   useEffect(() => {
+    if (!isHr) api.goals().then((g) => setGoal(g[0]?.goal ?? null));
     api.team().then(setPeople);
     api.requests(isHr ? "all" : "team").then((rs) => {
       const waiting = isHr ? "pending_hr" : "pending_manager";
@@ -71,6 +75,14 @@ export default function Team() {
           )}
         </Card>
       </div>
+
+      {!isHr && goal !== undefined && (
+        <>
+          <GoalCard goal={goal} onEdit={() => setGoalOpen(true)} />
+          <GoalModal open={goalOpen} onClose={() => setGoalOpen(false)} current={goal}
+            onSaved={(g) => { setGoal(g); setGoalOpen(false); }} />
+        </>
+      )}
 
       <section>
         <div className="mb-4 mt-2 flex flex-wrap items-end justify-between gap-3">

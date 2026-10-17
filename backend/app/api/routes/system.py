@@ -16,7 +16,8 @@ def health():
 def integrations():
     llm = get_llm()
     return {
-        "1c_zup": {"provider": settings.hr_system_provider, "purpose": "кадровые данные, остатки отпуска, приказы"},
+        "1c_zup": {"provider": settings.hr_system_provider, "purpose": "кадровые данные, остатки отпуска, приказы",
+                   "directory_sync": "live" if settings.zup_url else "demo"},
         "documentolog": {"provider": settings.docflow_provider, "purpose": "регистрация заявлений и приказов"},
         "mail": {
             "mode": mail_mode(),

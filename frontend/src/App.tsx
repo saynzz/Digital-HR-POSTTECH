@@ -10,6 +10,7 @@ import Academy from "./pages/Academy";
 import Assistant from "./pages/Assistant";
 import CourseView from "./pages/CourseView";
 import TrackView from "./pages/TrackView";
+import Rewards from "./pages/Rewards";
 import Notifications from "./pages/Notifications";
 import RequestDetail from "./pages/RequestDetail";
 import RequestNew from "./pages/RequestNew";
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="team" element={<RequireAuth roles={["manager", "hr"]}><Team /></RequireAuth>} />
         <Route path="academy" element={<Academy />} />
         <Route path="academy/tracks/:id" element={<TrackView />} />
+        <Route path="rewards" element={<Rewards />} />
         <Route path="academy/:id" element={<CourseView />} />
         <Route path="assistant" element={<Assistant />} />
         <Route path="notifications" element={<Notifications />} />

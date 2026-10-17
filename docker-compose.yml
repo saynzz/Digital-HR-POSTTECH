@@ -43,6 +43,14 @@ services:
       CORS_ORIGINS: http://localhost:3000,http://localhost:5173
       HR_SYSTEM_PROVIDER: mock
       DOCFLOW_PROVIDER: mock
+      COMPANY_NAME: ${COMPANY_NAME:-ТОО «Jana Post»}
+      ZUP_URL: ${ZUP_URL:-}
+      ZUP_USER: ${ZUP_USER:-}
+      ZUP_PASSWORD: ${ZUP_PASSWORD:-}
+      ZUP_FIELD_MAP: ${ZUP_FIELD_MAP:-}
+      ZUP_VERIFY_TLS: ${ZUP_VERIFY_TLS:-true}
+      SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
+      RESET_DB_ON_SCHEMA_CHANGE: ${RESET_DB_ON_SCHEMA_CHANGE:-true}
       MAIL_PROVIDER: ${MAIL_PROVIDER:-auto}
       SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
       SMTP_PORT: ${SMTP_PORT:-587}
