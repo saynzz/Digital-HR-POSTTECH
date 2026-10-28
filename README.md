@@ -4,6 +4,42 @@ Jana Post × Terricon Valley Hackathon 2026 · **Challenge 02 / Digital HR**
 
 Один вход, а в нём профиль, HR-заявки, обучение (Jana Academy), AI-ассистент (AI Jana) и уведомления.
 
+![Главная сотрудника](docs/screenshots/01-dashboard.png)
+
+## Скриншоты
+
+### Сотрудник
+
+| Новая заявка: фургон везёт её по маршруту | Заявка оформлена: документ в 1С и Documentolog |
+|---|---|
+| ![Новая заявка](docs/screenshots/02-request-new.png) | ![Карточка заявки](docs/screenshots/03-request-detail.png) |
+| **Jana Academy: уровень, серия, траектории, рейтинг** | **Траектория «Адаптация новичка»** |
+| ![Jana Academy](docs/screenshots/04-academy.png) | ![Траектория](docs/screenshots/05-track.png) |
+| **Награды: коины, магазин, цель отдела, благодарности** | **AI Jana: ответ по базе знаний с источником** |
+| ![Награды](docs/screenshots/06-rewards.png) | ![AI Jana](docs/screenshots/07-assistant.png) |
+
+### Руководитель
+
+| Моя команда: заявки на согласование и цель отдела | AI-аналитика: кто давно не был в отпуске |
+|---|---|
+| ![Команда](docs/screenshots/08-team.png) | ![Аналитика руководителя](docs/screenshots/09-manager-analytics.png) |
+
+### HR
+
+| Кандидаты и онбординг | Импорт сотрудников из 1С:ЗУП с предпросмотром |
+|---|---|
+| ![HR-панель](docs/screenshots/10-hr-candidates.png) | ![Импорт из 1С](docs/screenshots/11-hr-import.png) |
+| **Награды и цели: обмены коинов и каталог** | |
+| ![Награды и цели](docs/screenshots/12-hr-rewards.png) | |
+
+### Мобильная версия
+
+<p>
+  <img src="docs/screenshots/13-mobile-dashboard.png" width="280" alt="Главная на телефоне">
+  &nbsp;
+  <img src="docs/screenshots/14-mobile-academy.png" width="280" alt="Jana Academy на телефоне">
+</p>
+
 ## Быстрый старт без Docker (macOS)
 
 Нужны Python 3.10–3.13 и Node.js 18+ (`brew install python@3.13 node`).
